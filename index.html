@@ -104,6 +104,9 @@
 .reader-footer[hidden]{display:none}
 .ask-also{position:absolute;right:20px;bottom:32px;pointer-events:auto;display:flex;align-items:center;justify-content:center;gap:6px;width:106px;height:44px;padding:8px 16px 8px 12px;border-radius:99px;background:rgba(255,255,255,.8);box-shadow:0 4px 28px rgba(0,0,0,.16);font-family:"PingFang SC",sans-serif;font-size:16px;font-weight:500;line-height:24px;color:var(--dots-title);letter-spacing:0}
 .ask-also-logo{width:24px;height:24px;display:grid;place-items:center;flex:none}.ask-also-logo img{flex:none}
+.ai-footer .ask-also{position:static}
+.ai-card:not(.paged-note) .ai-footer{padding-right:20px}
+.ai-card:not(.paged-note) #viewConversation,.paged-note #askFromNote{display:none}
 .reader-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#111}
 .conversation-mode.reading-mode .sheet-space{padding-bottom:96px}
 .recommended-queries[hidden]{display:none}
@@ -247,7 +250,7 @@
           </div>
         </div>
         <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话"></div><span id="answerPageCount" class="answer-page-count" hidden></span>
-        <footer class="ai-footer"><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button></footer>
+        <footer class="ai-footer"><button type="button" class="ask-also" id="askFromNote"><span class="ask-also-logo"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2Ljc5OTMiIGhlaWdodD0iMTYuNzk5NyIgdmlld0JveD0iMCAwIDE2Ljc5OTMgMTYuNzk5NyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IlZlY3RvciI+CjxwYXRoIGQ9Ik02Ljc0ODc0IDE2Ljc5ODJDNi43NDg3NCAxNi43OTc4IDYuNzQ5MDIgMTYuNzk3NiA2Ljc0OTM1IDE2Ljc5NzZDNy4xNzcwMyAxNi43OTc2IDcuNDgwODggMTYuNzkwMyA3Ljg0NjY5IDE2Ljc4M0M4LjY0Njc1IDE2Ljc3MiA5LjQ0MzE2IDE2LjcwODggMTAuMjMzNSAxNi41ODQ4QzExLjAyMjYgMTYuNDU4MyAxMS43ODg2IDE2LjIyIDEyLjUwMzYgMTUuODc5NUMxMy45NDA4IDE1LjE4ODggMTUuMTA5MiAxNC4wODcxIDE1Ljg0MTIgMTIuNzMxM0MxNi4yMDIzIDEyLjA1NjUgMTYuNDU1MiAxMS4zMzU0IDE2LjU5MDIgMTAuNTlDMTYuNzE5MSA5Ljg0ODIzIDE2Ljc5OTMgOS4wOTc5NyAxNi43OTkzIDguMzQ0MDZDMTYuNzk5MyA2LjM0Mzc3IDE2LjA3OTUgNC4xODkwNiAxNC4zNTc4IDIuNDY3MjNDMTIuNjM0OSAwLjc0NjYxMyAxMC41ODM3IDAgOC40NTIyMSAwQzcuNzAwNzkgMCA2Ljk1MDU4IDAuMDc5MDM4OCA2LjIwODg4IDAuMjA5MTQ5QzUuNDY0NzYgMC4zNDQxMjMgNC43NDI1MiAwLjU5NzA0NyA0LjA2NzcgMC45NTgxOTNDMi43MTMxOSAxLjY5MDIxIDEuNjEwMzggMi44NTc1NiAwLjkxOTc0OCA0LjI5MzYzQzAuNTc5Mjk4IDUuMDA5ODQgMC4zNDIxOTkgNS43NzQ3IDAuMjE0NTMgNi41NjUwOEMwLjA5MTcyNDYgNy4zNTQyNiAwLjAyNjA2NjMgOC4xNTE5NCAwLjAxNjMzOTIgOC45NTIwNkMwLjAwNzgyNzk0IDkuMzE4MDcgMC4wMDE3NDg0OCA5LjY3MzEzIDAuMDAxNzQ4NDggMTAuMDUwMUMwLjAwMTc0ODQ4IDEwLjI5MjggMC4wMDA3NDA0MTUgMTMuMDIxIDIuMjM2MDllLTA1IDE0LjkzMzZDLTAuMDAwMzA3ODQgMTUuODEzMSAtMC4wMDA0NzI5NDEgMTYuMjUyOSAwLjI3Mjk3OCAxNi41MjY0QzAuNTQ2NDI4IDE2Ljc5OTkgMC45ODYxNyAxNi43OTk4IDEuODY1NjUgMTYuNzk5NkMzLjc2NTU5IDE2Ljc5OTMgNi40NzA5OCAxNi43OTg4IDYuNzQ4MzEgMTYuNzk4OEM2Ljc0ODY1IDE2Ljc5ODggNi43NDg3NCAxNi43OTg1IDYuNzQ4NzQgMTYuNzk4MloiIGZpbGw9ImJsYWNrIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8cGF0aCBkPSJNNi43NDg3NCAxNi43OTgyQzYuNzQ4NzQgMTYuNzk3OCA2Ljc0OTAyIDE2Ljc5NzYgNi43NDkzNSAxNi43OTc2QzcuMTc3MDMgMTYuNzk3NiA3LjQ4MDg4IDE2Ljc5MDMgNy44NDY2OSAxNi43ODNDOC42NDY3NSAxNi43NzIgOS40NDMxNiAxNi43MDg4IDEwLjIzMzUgMTYuNTg0OEMxMS4wMjI2IDE2LjQ1ODMgMTEuNzg4NiAxNi4yMiAxMi41MDM2IDE1Ljg3OTVDMTMuOTQwOCAxNS4xODg4IDE1LjEwOTIgMTQuMDg3MSAxNS44NDEyIDEyLjczMTNDMTYuMjAyMyAxMi4wNTY1IDE2LjQ1NTIgMTEuMzM1NCAxNi41OTAyIDEwLjU5QzE2LjcxOTEgOS44NDgyMyAxNi43OTkzIDkuMDk3OTcgMTYuNzk5MyA4LjM0NDA2QzE2Ljc5OTMgNi4zNDM3NyAxNi4wNzk1IDQuMTg5MDYgMTQuMzU3OCAyLjQ2NzIzQzEyLjYzNDkgMC43NDY2MTMgMTAuNTgzNyAwIDguNDUyMjEgMEM3LjcwMDc5IDAgNi45NTA1OCAwLjA3OTAzODggNi4yMDg4OCAwLjIwOTE0OUM1LjQ2NDc2IDAuMzQ0MTIzIDQuNzQyNTIgMC41OTcwNDcgNC4wNjc3IDAuOTU4MTkzQzIuNzEzMTkgMS42OTAyMSAxLjYxMDM4IDIuODU3NTYgMC45MTk3NDggNC4yOTM2M0MwLjU3OTI5OCA1LjAwOTg0IDAuMzQyMTk5IDUuNzc0NyAwLjIxNDUzIDYuNTY1MDhDMC4wOTE3MjQ2IDcuMzU0MjYgMC4wMjYwNjYzIDguMTUxOTQgMC4wMTYzMzkyIDguOTUyMDZDMC4wMDc4Mjc5NCA5LjMxODA3IDAuMDAxNzQ4NDggOS42NzMxMyAwLjAwMTc0ODQ4IDEwLjA1MDFDMC4wMDE3NDg0OCAxMC4yOTI4IDAuMDAwNzQwNDE1IDEzLjAyMSAyLjIzNjA5ZS0wNSAxNC45MzM2Qy0wLjAwMDMwNzg0IDE1LjgxMzEgLTAuMDAwNDcyOTQxIDE2LjI1MjkgMC4yNzI5NzggMTYuNTI2NEMwLjU0NjQyOCAxNi43OTk5IDAuOTg2MTcgMTYuNzk5OCAxLjg2NTY1IDE2Ljc5OTZDMy43NjU1OSAxNi43OTkzIDYuNDcwOTggMTYuNzk4OCA2Ljc0ODMxIDE2Ljc5ODhDNi43NDg2NSAxNi43OTg4IDYuNzQ4NzQgMTYuNzk4NSA2Ljc0ODc0IDE2Ljc5ODJaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMF83KSIvPgo8L2c+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMF83IiB4MT0iMTQuNDY2MiIgeTE9IjIuMzMzMTEiIHgyPSItMC4wMDA2ODMzMTEiIHkyPSIxNi44IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM4M0YyREYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDlGN0YyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==" alt="" width="16.7993" height="16.7997"></span><span>问点点</span></button><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button></footer>
       </article>
     </div>
     <nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav>
@@ -551,7 +554,7 @@ const suggestions=[
 ];
 function syncQuestion(){ $('#sendAsk').disabled=!questionInput.value.trim();$('#askFeedback').textContent=''; }
 for(const [label] of suggestions){const button=document.createElement('button');button.type='button';button.className='sheet-suggestion';button.disabled=true;button.append(document.createTextNode(label));const icon=document.createElement('img');icon.src='data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiB2aWV3Qm94PSIwIDAgMTIgMTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJhcnJvd18mIzIyODsmIzE4NDsmIzEzODsmIzIzMDsmIzE2MTsmIzEzNDsiIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8wXzE0OSkiPgo8cGF0aCBpZD0idW5pb24iIGQ9Ik0yLjA4MjMyIDIuNTgyMzJDMi4wODIzMiAyLjMwNjE4IDIuMzA2MTcgMi4wODIzMiAyLjU4MjMyIDIuMDgyMzJMNy41MzIwNiAyLjA4MjMyQzcuODA4MjEgMi4wODIzMiA4LjAzMjA2IDIuMzA2MTggOC4wMzIwNiAyLjU4MjMyQzguMDMyMDYgMi44NTg0NiA3LjgwODIxIDMuMDgyMzIgNy41MzIwNiAzLjA4MjMyTDMuNzg5NDIgMy4wODIzMkw5Ljc3MTIzIDkuMDY0MTNDOS45NjY1IDkuMjU5MzkgOS45NjY1IDkuNTc1OTcgOS43NzEyMyA5Ljc3MTI0QzkuNTc1OTcgOS45NjY1IDkuMjU5MzkgOS45NjY1IDkuMDY0MTMgOS43NzEyNEwzLjA4MjMyIDMuNzg5NDJMMy4wODIzMiA3LjUzMjA3QzMuMDgyMzIgNy44MDgyMSAyLjg1ODQ2IDguMDMyMDcgMi41ODIzMiA4LjAzMjA3QzIuMzA2MTcgOC4wMzIwNyAyLjA4MjMyIDcuODA4MjEgMi4wODIzMiA3LjUzMjA3TDIuMDgyMzIgMi41ODIzMloiIGZpbGw9ImJsYWNrIiBmaWxsLW9wYWNpdHk9IjAuNDUiLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF8wXzE0OSI+CjxyZWN0IHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K';icon.alt='';button.append(icon);$('#askSuggestions').append(button)}
-let previousFocus,inertElements=[],closeTimer,conversationMode=false;
+let previousFocus,inertElements=[],closeTimer,conversationMode=false,directAskEntry=false;
 // Match content anchors rather than scroll percentages, which change when text reflows.
 const readingBlocks=[...answer.querySelectorAll('.user-message p,.dots-intro p,.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image,.answer-actions')];
 readingBlocks.forEach((el,index)=>el.dataset.readingAnchor=String(index));
@@ -620,7 +623,7 @@ function cancelConversationTransition(){
 function conversationSource(){
   const card=$('.ai-card'),rect=card.getBoundingClientRect(),viewport=note.getBoundingClientRect();
   const top=Math.max(rect.top,viewport.top),bottom=Math.min(rect.bottom,viewport.bottom);
-  const element=bottom>top?card:$('#viewConversation');
+  const element=bottom>top?card:$(card.classList.contains('paged-note')?'#viewConversation':'#askFromNote');
   const inset=16*(rect.width/card.offsetWidth||1);
   const clipRect=element===card?{left:rect.left+inset,top,width:rect.width-inset*2,height:bottom-top}:element.getBoundingClientRect();
   return {element,rect:clipRect,snapshot:demoMotion.capture(element,{surface:'card',clipRect})};
@@ -633,15 +636,17 @@ function enterFullConversation(position='bottom',origin){
   // The position callback queued by setConversationMode runs first, at the final layout size.
   requestAnimationFrame(()=>{
     if(token!==conversationEntryToken||askOverlay.hidden)return;
+    if(position?.recommendations)openRecommendedQueries();
     conversationEntryAnimation=demoMotion.transition({
       fromRect:source.rect,toRect:askSheet.getBoundingClientRect(),
       fromSnapshot:source.snapshot,toSnapshot:demoMotion.capture(askSheet,{surface:'conversation'}),
-      onFinish:()=>{if(token!==conversationEntryToken)return;askOverlay.style.visibility='';$('#closeAsk').focus({preventScroll:true})}
+      onFinish:()=>{if(token!==conversationEntryToken)return;askOverlay.style.visibility='';$(position?.recommendations?'#recommendedQueries button':'#closeAsk').focus({preventScroll:true})}
     });
   });
 }
 function openAsk(full=false,position='bottom'){
   clearTimeout(closeTimer);previousFocus=document.activeElement;
+  directAskEntry=position?.recommendations===true;
   const origin=full?conversationSource():null;
   askOverlay.hidden=false;
   inertElements=[...$('.phone').children].filter(el=>el!==askOverlay&&!el.inert);
@@ -651,12 +656,12 @@ function openAsk(full=false,position='bottom'){
   requestAnimationFrame(()=>{if(token!==conversationEntryToken||askOverlay.hidden)return;askOverlay.classList.add('is-open');$('#closeAsk').focus({preventScroll:true})});
 }
 function closeAsk(){
-  if(askSheet.classList.contains('recommendation-mode')||askSheet.classList.contains('query-mode')){returnToReader();return}
+  if(!directAskEntry&&(askSheet.classList.contains('recommendation-mode')||askSheet.classList.contains('query-mode'))){returnToReader();return}
   clearTimeout(closeTimer);cancelConversationTransition();const token=conversationEntryToken;
   questionInput.blur();
   const finish=()=>{
     if(token!==conversationEntryToken)return;
-    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
+    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);directAskEntry=false;
     inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
   };
   if(conversationMode){
@@ -667,8 +672,10 @@ function closeAsk(){
   }else{askOverlay.classList.remove('is-open');closeTimer=setTimeout(finish,smooth==='auto'?0:240)}
 }
 $('#viewConversation').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true}));
+$('#askFromNote').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true,recommendations:true}));
 let readerReturnScroll=0;
 function returnToReader(){
+  if(directAskEntry){closeAsk();return}
   questionInput.blur();setConversationMode(true,{reading:true});
   $('#conversationScroll').scrollTop=readerReturnScroll;
   $('#askAlso').focus({preventScroll:true});
@@ -683,7 +690,8 @@ function openRecommendedQueries(){
   askSheet.classList.remove('reading-mode','query-mode');
   askSheet.classList.add('recommendation-mode','keyboard-open');
   $('#readerFooter').hidden=true;$('#recommendedQueries').hidden=false;$('#newTopic').hidden=true;
-  $('#closeAsk').setAttribute('aria-label','返回完整对话');
+  $('#closeAsk').setAttribute('aria-label',directAskEntry?'返回小红书笔记':'返回完整对话');
+  $('#recommendationDismiss').setAttribute('aria-label',directAskEntry?'收起推荐问题，返回小红书笔记':'收起推荐问题，返回完整对话');
   questionInput.value='';syncQuestion();
   setRecommendationBackground(true);$('#conversationScroll').scrollTop=readerReturnScroll;
 }
@@ -914,6 +922,7 @@ function setFeedVisible(show,animate=true){
   detailSurfaces.forEach(el=>el.inert=animate||show);
   $('.demo-jumps').hidden=show||isPagedNote;
   $('#guideIntro').innerHTML=show?'左列体验上下滑动，<br>右上角体验左右翻页。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
+  $('.guide-items>div:last-child p').innerHTML='<b>随时继续追问</b>'+(show?'上下滑动方案点「问点点」直接追问，左右滑动方案可先查看完整对话。':isPagedNote?'查看完整对话，再点「问点点」继续聊。':'点右下角「问点点」，选择推荐问题继续聊。');
   updateProgress();
   const finish=()=>{if(token!==feedTransitionToken)return;feedPage.hidden=!show;feedPage.inert=!show;detailSurfaces.forEach(el=>el.inert=show);if(animate)(show?activeFeedCard:$('#back')).focus({preventScroll:true})};
   if(animate){

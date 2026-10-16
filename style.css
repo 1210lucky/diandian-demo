@@ -78,6 +78,9 @@
 .reader-footer[hidden]{display:none}
 .ask-also{position:absolute;right:20px;bottom:32px;pointer-events:auto;display:flex;align-items:center;justify-content:center;gap:6px;width:106px;height:44px;padding:8px 16px 8px 12px;border-radius:99px;background:rgba(255,255,255,.8);box-shadow:0 4px 28px rgba(0,0,0,.16);font-family:"PingFang SC",sans-serif;font-size:16px;font-weight:500;line-height:24px;color:var(--dots-title);letter-spacing:0}
 .ask-also-logo{width:24px;height:24px;display:grid;place-items:center;flex:none}.ask-also-logo img{flex:none}
+.ai-footer .ask-also{position:static}
+.ai-card:not(.paged-note) .ai-footer{padding-right:20px}
+.ai-card:not(.paged-note) #viewConversation,.paged-note #askFromNote{display:none}
 .reader-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#111}
 .conversation-mode.reading-mode .sheet-space{padding-bottom:96px}
 .recommended-queries[hidden]{display:none}

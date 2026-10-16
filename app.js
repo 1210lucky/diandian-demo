@@ -43,7 +43,7 @@ const suggestions=[
 ];
 function syncQuestion(){ $('#sendAsk').disabled=!questionInput.value.trim();$('#askFeedback').textContent=''; }
 for(const [label] of suggestions){const button=document.createElement('button');button.type='button';button.className='sheet-suggestion';button.disabled=true;button.append(document.createTextNode(label));const icon=document.createElement('img');icon.src='assets/sheet-sug-arrow.svg';icon.alt='';button.append(icon);$('#askSuggestions').append(button)}
-let previousFocus,inertElements=[],closeTimer,conversationMode=false;
+let previousFocus,inertElements=[],closeTimer,conversationMode=false,directAskEntry=false;
 // Match content anchors rather than scroll percentages, which change when text reflows.
 const readingBlocks=[...answer.querySelectorAll('.user-message p,.dots-intro p,.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image,.answer-actions')];
 readingBlocks.forEach((el,index)=>el.dataset.readingAnchor=String(index));
@@ -112,7 +112,7 @@ function cancelConversationTransition(){
 function conversationSource(){
   const card=$('.ai-card'),rect=card.getBoundingClientRect(),viewport=note.getBoundingClientRect();
   const top=Math.max(rect.top,viewport.top),bottom=Math.min(rect.bottom,viewport.bottom);
-  const element=bottom>top?card:$('#viewConversation');
+  const element=bottom>top?card:$(card.classList.contains('paged-note')?'#viewConversation':'#askFromNote');
   const inset=16*(rect.width/card.offsetWidth||1);
   const clipRect=element===card?{left:rect.left+inset,top,width:rect.width-inset*2,height:bottom-top}:element.getBoundingClientRect();
   return {element,rect:clipRect,snapshot:demoMotion.capture(element,{surface:'card',clipRect})};
@@ -125,15 +125,17 @@ function enterFullConversation(position='bottom',origin){
   // The position callback queued by setConversationMode runs first, at the final layout size.
   requestAnimationFrame(()=>{
     if(token!==conversationEntryToken||askOverlay.hidden)return;
+    if(position?.recommendations)openRecommendedQueries();
     conversationEntryAnimation=demoMotion.transition({
       fromRect:source.rect,toRect:askSheet.getBoundingClientRect(),
       fromSnapshot:source.snapshot,toSnapshot:demoMotion.capture(askSheet,{surface:'conversation'}),
-      onFinish:()=>{if(token!==conversationEntryToken)return;askOverlay.style.visibility='';$('#closeAsk').focus({preventScroll:true})}
+      onFinish:()=>{if(token!==conversationEntryToken)return;askOverlay.style.visibility='';$(position?.recommendations?'#recommendedQueries button':'#closeAsk').focus({preventScroll:true})}
     });
   });
 }
 function openAsk(full=false,position='bottom'){
   clearTimeout(closeTimer);previousFocus=document.activeElement;
+  directAskEntry=position?.recommendations===true;
   const origin=full?conversationSource():null;
   askOverlay.hidden=false;
   inertElements=[...$('.phone').children].filter(el=>el!==askOverlay&&!el.inert);
@@ -143,12 +145,12 @@ function openAsk(full=false,position='bottom'){
   requestAnimationFrame(()=>{if(token!==conversationEntryToken||askOverlay.hidden)return;askOverlay.classList.add('is-open');$('#closeAsk').focus({preventScroll:true})});
 }
 function closeAsk(){
-  if(askSheet.classList.contains('recommendation-mode')||askSheet.classList.contains('query-mode')){returnToReader();return}
+  if(!directAskEntry&&(askSheet.classList.contains('recommendation-mode')||askSheet.classList.contains('query-mode'))){returnToReader();return}
   clearTimeout(closeTimer);cancelConversationTransition();const token=conversationEntryToken;
   questionInput.blur();
   const finish=()=>{
     if(token!==conversationEntryToken)return;
-    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
+    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);directAskEntry=false;
     inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
   };
   if(conversationMode){
@@ -159,8 +161,10 @@ function closeAsk(){
   }else{askOverlay.classList.remove('is-open');closeTimer=setTimeout(finish,smooth==='auto'?0:240)}
 }
 $('#viewConversation').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true}));
+$('#askFromNote').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true,recommendations:true}));
 let readerReturnScroll=0;
 function returnToReader(){
+  if(directAskEntry){closeAsk();return}
   questionInput.blur();setConversationMode(true,{reading:true});
   $('#conversationScroll').scrollTop=readerReturnScroll;
   $('#askAlso').focus({preventScroll:true});
@@ -175,7 +179,8 @@ function openRecommendedQueries(){
   askSheet.classList.remove('reading-mode','query-mode');
   askSheet.classList.add('recommendation-mode','keyboard-open');
   $('#readerFooter').hidden=true;$('#recommendedQueries').hidden=false;$('#newTopic').hidden=true;
-  $('#closeAsk').setAttribute('aria-label','返回完整对话');
+  $('#closeAsk').setAttribute('aria-label',directAskEntry?'返回小红书笔记':'返回完整对话');
+  $('#recommendationDismiss').setAttribute('aria-label',directAskEntry?'收起推荐问题，返回小红书笔记':'收起推荐问题，返回完整对话');
   questionInput.value='';syncQuestion();
   setRecommendationBackground(true);$('#conversationScroll').scrollTop=readerReturnScroll;
 }
