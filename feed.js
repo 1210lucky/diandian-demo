@@ -20,7 +20,6 @@ function setFeedVisible(show,animate=true){
   detailSurfaces.forEach(el=>el.inert=animate||show);
   $('.demo-jumps').hidden=show||isPagedNote;
   $('#guideIntro').innerHTML=show?'左列体验上下滑动，<br>右上角体验左右翻页。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
-  $('.guide-items>div:last-child p').innerHTML='<b>随时继续追问</b>'+(show?'上下滑动方案点「问点点」直接追问，左右滑动方案可先查看完整对话。':isPagedNote?'查看完整对话，再点「问点点」继续聊。':'点右下角「问点点」，选择推荐问题继续聊。');
   updateProgress();
   const finish=()=>{if(token!==feedTransitionToken)return;feedPage.hidden=!show;feedPage.inert=!show;detailSurfaces.forEach(el=>el.inert=show);if(animate)(show?activeFeedCard:$('#back')).focus({preventScroll:true})};
   if(animate){
