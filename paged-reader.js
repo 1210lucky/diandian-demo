@@ -1,4 +1,4 @@
-// Each state paginates into its actual visible area, with a semantic reading anchor.
+// Normal and clean reading share the same page canvas and content cuts.
 const pagedPhone=$('.phone'),pagedMedia=$('.media-area'),pagedHeader=$('.phone>.note-header'),pagedEngage=$('.phone>.engage-bar');
 let pagedClean=false,cleanProgress=0,pagedFrame=0,pagedGesture=null,pagedWheelTimer=0;
 let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
@@ -7,13 +7,13 @@ const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 function measurePagedReader(){
   const phoneHeight=pagedPhone.clientHeight;
   pagedBaseHeight=phoneHeight-pagedHeader.offsetHeight-pagedEngage.offsetHeight;
-  const pageHeight=Math.max(240,pagedClean?phoneHeight-40:pagedBaseHeight-56);
+  const pageHeight=Math.max(240,pagedBaseHeight-56);
   pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');
   pagedPhone.style.setProperty('--paged-page-height',pageHeight+'px');
   pagedPhone.style.setProperty('--paged-growth',(phoneHeight-pagedBaseHeight)+'px');
-  pagedPhone.style.setProperty('--paged-center','12px');
+  pagedPhone.style.setProperty('--paged-center',Math.max(12,(phoneHeight-pageHeight-24)/2)+'px');
 }
 function paintPagedReader(progress){
   cleanProgress=progress;
@@ -39,22 +39,7 @@ function animatePagedReader(clean,scrollTop=0){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   const startProgress=cleanProgress,startScroll=note.scrollTop,start=performance.now();
   const duration=reducedPagedMotion.matches?0:340;
-  if(clean!==pagedClean){
-    const returningToEntry=!clean&&answerPageIndex===pagedModeStartIndex&&pagedModeAnchor;
-    const position=returningToEntry?pagedModeAnchor:capturePagedPosition();
-    if(clean)pagedModeAnchor=position;
-    setPagedCleanState(clean);measurePagedReader();buildAnswerPages(position);
-    if(clean)pagedModeStartIndex=answerPageIndex;
-    else if(!returningToEntry&&scrollTop===0){
-      const blocks=[...pageTrack.children[answerPageIndex].querySelectorAll('[data-reading-anchor]')];
-      const block=blocks.find(el=>el.dataset.readingAnchor===position.anchor&&
-        Number(el.dataset.textStart||0)<=position.textIndex&&Number(el.dataset.textStart||0)+Math.max(1,el.textContent.length)>position.textIndex);
-      if(block){
-        const point=block.matches('p,h4')?textPointAtIndex(block,position.textIndex-Number(block.dataset.textStart||0)):null;
-        scrollTop=Math.max(0,((point||block.getBoundingClientRect()).top-pageTrack.getBoundingClientRect().top)/pagedScale()-16);
-      }
-    }
-  }else setPagedCleanState(clean);
+  setPagedCleanState(clean);
   function step(now){
     const fraction=duration?Math.min(1,(now-start)/duration):1;
     const eased=1-Math.pow(1-fraction,3);
@@ -77,7 +62,6 @@ function revealPagedDetails(){
 function resetPagedReader(){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   pagedFrame=0;pagedGesture=null;pagedClean=false;ignorePagedClickUntil=0;ignorePagedWheelUntil=0;
-  pagedModeAnchor=null;
   paintPagedReader(0);
   pagedPhone.classList.remove('paged-clean','paged-dragging');
   delete pagedPhone.dataset.readingMode;

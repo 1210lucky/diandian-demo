@@ -2,7 +2,6 @@
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
 let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
-let pagedModeAnchor=null,pagedModeStartIndex=0;
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -41,17 +40,10 @@ function capturePagedPosition(){
   const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
   return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
 }
-function pageAtPosition(position){
-  return [...pageTrack.children].findIndex(slide=>[...slide.querySelectorAll('[data-reading-anchor]')].some(block=>{
-    if(block.dataset.readingAnchor!==position.anchor)return false;
-    const start=Number(block.dataset.textStart||0);
-    return position.textIndex>=start&&position.textIndex<start+Math.max(1,block.textContent.length);
-  }));
-}
-function buildAnswerPages(position){
+function buildAnswerPages(){
   const width=pageTrack.clientWidth,height=pageTrack.clientHeight;
   if(!width||!height)return;
-  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length&&!position)return;
+  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length)return;
   pageBuildSize=size;const previous=answerPageIndex;pageTrack.replaceChildren();pageDots.replaceChildren();
   let page,body,response;
   const newPage=()=>{
@@ -80,29 +72,15 @@ function buildAnswerPages(position){
       copy.classList.add('text-continues');start=low;newPage();copy=pageClone(original);copy.classList.add('text-continuation');body.append(copy);
     }
   }
-  // On a size/mode change keep the visible passage at a page boundary. Reflow the
-  // surrounding content without sending the reader back to the start of a paragraph.
-  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')].flatMap(element=>{
-    if(!pagedClean||element.dataset.readingAnchor!==position?.anchor)return [element];
-    const at=position.textIndex||0,copy=pageClone(element);
-    if(at>0&&at<element.textContent.length&&element.matches('p')){
-      const before=pageClone(element);
-      before.replaceChildren(textFragment(element,0,at));
-      copy.replaceChildren(textFragment(element,at,element.textContent.length));
-      copy.dataset.textStart=String(at);copy.dataset.pageBreak='true';
-      return [before,copy];
-    }
-    copy.dataset.pageBreak='true';return [copy];
-  });
+  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')];
   // Keep a title/status with the beginning of its paragraph, not the entire paragraph.
   const groups=[];
   for(let i=0;i<originals.length;i++){
     const group=[originals[i]];
-    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p')&&!originals[i+1].dataset.pageBreak)group.push(originals[++i]);
+    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p'))group.push(originals[++i]);
     groups.push(group);
   }
   for(const group of groups){
-    if(group[0].dataset.pageBreak&&body.children.length)newPage();
     if(!response)responseShell();
     const wrapper=document.createElement('div');wrapper.className='page-block';group.forEach(el=>wrapper.append(pageClone(el)));response.append(wrapper);
     if(fits())continue;
@@ -155,8 +133,7 @@ function buildAnswerPages(position){
       dot.addEventListener('click',()=>selectAnswerPage(Number(dot.dataset.page)));pageDots.append(dot);
     }
   });
-  const located=position?pageAtPosition(position):-1;
-  selectAnswerPage(located<0?previous:located,false);
+  selectAnswerPage(previous,false);
 }
 function setNotePagination(enabled){
   resetPagedReader();

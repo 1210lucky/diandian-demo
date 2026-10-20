@@ -136,7 +136,7 @@
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
-/* Normal and clean reading use their available height and share a content anchor. */
+/* Hide the chrome without changing page size, text cuts, or image geometry. */
 .clean-page-count{display:none}
 .phone.paged-mode{--clean-progress:0;background:var(--dots-bg-0)}
 .paged-mode>.note-header{position:absolute;left:0;right:0;top:0;transform:translateY(calc(-100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}

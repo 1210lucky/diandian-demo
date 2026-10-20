@@ -162,7 +162,7 @@
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
-/* Normal and clean reading use their available height and share a content anchor. */
+/* Hide the chrome without changing page size, text cuts, or image geometry. */
 .clean-page-count{display:none}
 .phone.paged-mode{--clean-progress:0;background:var(--dots-bg-0)}
 .paged-mode>.note-header{position:absolute;left:0;right:0;top:0;transform:translateY(calc(-100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
@@ -762,7 +762,6 @@ updateProgress();
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
 let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
-let pagedModeAnchor=null,pagedModeStartIndex=0;
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -801,17 +800,10 @@ function capturePagedPosition(){
   const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
   return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
 }
-function pageAtPosition(position){
-  return [...pageTrack.children].findIndex(slide=>[...slide.querySelectorAll('[data-reading-anchor]')].some(block=>{
-    if(block.dataset.readingAnchor!==position.anchor)return false;
-    const start=Number(block.dataset.textStart||0);
-    return position.textIndex>=start&&position.textIndex<start+Math.max(1,block.textContent.length);
-  }));
-}
-function buildAnswerPages(position){
+function buildAnswerPages(){
   const width=pageTrack.clientWidth,height=pageTrack.clientHeight;
   if(!width||!height)return;
-  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length&&!position)return;
+  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length)return;
   pageBuildSize=size;const previous=answerPageIndex;pageTrack.replaceChildren();pageDots.replaceChildren();
   let page,body,response;
   const newPage=()=>{
@@ -840,29 +832,15 @@ function buildAnswerPages(position){
       copy.classList.add('text-continues');start=low;newPage();copy=pageClone(original);copy.classList.add('text-continuation');body.append(copy);
     }
   }
-  // On a size/mode change keep the visible passage at a page boundary. Reflow the
-  // surrounding content without sending the reader back to the start of a paragraph.
-  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')].flatMap(element=>{
-    if(!pagedClean||element.dataset.readingAnchor!==position?.anchor)return [element];
-    const at=position.textIndex||0,copy=pageClone(element);
-    if(at>0&&at<element.textContent.length&&element.matches('p')){
-      const before=pageClone(element);
-      before.replaceChildren(textFragment(element,0,at));
-      copy.replaceChildren(textFragment(element,at,element.textContent.length));
-      copy.dataset.textStart=String(at);copy.dataset.pageBreak='true';
-      return [before,copy];
-    }
-    copy.dataset.pageBreak='true';return [copy];
-  });
+  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')];
   // Keep a title/status with the beginning of its paragraph, not the entire paragraph.
   const groups=[];
   for(let i=0;i<originals.length;i++){
     const group=[originals[i]];
-    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p')&&!originals[i+1].dataset.pageBreak)group.push(originals[++i]);
+    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p'))group.push(originals[++i]);
     groups.push(group);
   }
   for(const group of groups){
-    if(group[0].dataset.pageBreak&&body.children.length)newPage();
     if(!response)responseShell();
     const wrapper=document.createElement('div');wrapper.className='page-block';group.forEach(el=>wrapper.append(pageClone(el)));response.append(wrapper);
     if(fits())continue;
@@ -915,8 +893,7 @@ function buildAnswerPages(position){
       dot.addEventListener('click',()=>selectAnswerPage(Number(dot.dataset.page)));pageDots.append(dot);
     }
   });
-  const located=position?pageAtPosition(position):-1;
-  selectAnswerPage(located<0?previous:located,false);
+  selectAnswerPage(previous,false);
 }
 function setNotePagination(enabled){
   resetPagedReader();
@@ -939,7 +916,7 @@ pageTrack.addEventListener('keydown',e=>{
   else if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePagedReader()}
 });
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);
-</script><script>// Each state paginates into its actual visible area, with a semantic reading anchor.
+</script><script>// Normal and clean reading share the same page canvas and content cuts.
 const pagedPhone=$('.phone'),pagedMedia=$('.media-area'),pagedHeader=$('.phone>.note-header'),pagedEngage=$('.phone>.engage-bar');
 let pagedClean=false,cleanProgress=0,pagedFrame=0,pagedGesture=null,pagedWheelTimer=0;
 let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
@@ -948,13 +925,13 @@ const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 function measurePagedReader(){
   const phoneHeight=pagedPhone.clientHeight;
   pagedBaseHeight=phoneHeight-pagedHeader.offsetHeight-pagedEngage.offsetHeight;
-  const pageHeight=Math.max(240,pagedClean?phoneHeight-40:pagedBaseHeight-56);
+  const pageHeight=Math.max(240,pagedBaseHeight-56);
   pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');
   pagedPhone.style.setProperty('--paged-page-height',pageHeight+'px');
   pagedPhone.style.setProperty('--paged-growth',(phoneHeight-pagedBaseHeight)+'px');
-  pagedPhone.style.setProperty('--paged-center','12px');
+  pagedPhone.style.setProperty('--paged-center',Math.max(12,(phoneHeight-pageHeight-24)/2)+'px');
 }
 function paintPagedReader(progress){
   cleanProgress=progress;
@@ -980,22 +957,7 @@ function animatePagedReader(clean,scrollTop=0){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   const startProgress=cleanProgress,startScroll=note.scrollTop,start=performance.now();
   const duration=reducedPagedMotion.matches?0:340;
-  if(clean!==pagedClean){
-    const returningToEntry=!clean&&answerPageIndex===pagedModeStartIndex&&pagedModeAnchor;
-    const position=returningToEntry?pagedModeAnchor:capturePagedPosition();
-    if(clean)pagedModeAnchor=position;
-    setPagedCleanState(clean);measurePagedReader();buildAnswerPages(position);
-    if(clean)pagedModeStartIndex=answerPageIndex;
-    else if(!returningToEntry&&scrollTop===0){
-      const blocks=[...pageTrack.children[answerPageIndex].querySelectorAll('[data-reading-anchor]')];
-      const block=blocks.find(el=>el.dataset.readingAnchor===position.anchor&&
-        Number(el.dataset.textStart||0)<=position.textIndex&&Number(el.dataset.textStart||0)+Math.max(1,el.textContent.length)>position.textIndex);
-      if(block){
-        const point=block.matches('p,h4')?textPointAtIndex(block,position.textIndex-Number(block.dataset.textStart||0)):null;
-        scrollTop=Math.max(0,((point||block.getBoundingClientRect()).top-pageTrack.getBoundingClientRect().top)/pagedScale()-16);
-      }
-    }
-  }else setPagedCleanState(clean);
+  setPagedCleanState(clean);
   function step(now){
     const fraction=duration?Math.min(1,(now-start)/duration):1;
     const eased=1-Math.pow(1-fraction,3);
@@ -1018,7 +980,6 @@ function revealPagedDetails(){
 function resetPagedReader(){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   pagedFrame=0;pagedGesture=null;pagedClean=false;ignorePagedClickUntil=0;ignorePagedWheelUntil=0;
-  pagedModeAnchor=null;
   paintPagedReader(0);
   pagedPhone.classList.remove('paged-clean','paged-dragging');
   delete pagedPhone.dataset.readingMode;
