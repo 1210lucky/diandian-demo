@@ -8,6 +8,7 @@ function captureNoteSurface(){
   return demoMotion.capture(detailSurfaces.filter(el=>el.matches('.note-header,.note-scroll,.engage-bar')),{surface:'phone'});
 }
 function setFeedVisible(show,animate=true){
+  if(show)resetPagedReader();
   const token=++feedTransitionToken;
   feedTransition?.cancel();
   // Keep the feed stationary behind the expanding or collapsing note snapshot.

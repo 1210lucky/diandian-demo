@@ -161,6 +161,20 @@
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
+/* Clean reading keeps the original page geometry, including its text and image cuts. */
+.clean-page-count{display:none}
+.phone.paged-mode{--clean-progress:0;background:var(--dots-bg-0)}
+.paged-mode>.note-header{position:absolute;left:0;right:0;top:0;transform:translateY(calc(-100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
+.paged-mode>.engage-bar{position:absolute;left:0;right:0;bottom:0;transform:translateY(calc(100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
+.paged-mode>.note-scroll{position:absolute;left:0;right:0;top:calc(var(--paged-header) * (1 - var(--clean-progress)));bottom:calc(var(--paged-bottom) * (1 - var(--clean-progress)));background:#fff;touch-action:pinch-zoom;overflow-anchor:none}
+.paged-mode .media-area{height:calc(var(--paged-base-height) + var(--paged-growth) * var(--clean-progress));min-height:0;max-height:none}
+.paged-mode .answer-pages{flex:none;height:var(--paged-page-height);transform:translateY(calc(var(--paged-center) * var(--clean-progress)));touch-action:pinch-zoom}
+.paged-mode .ai-footer{position:absolute;bottom:0;left:0;right:0;opacity:calc(1 - var(--clean-progress))}
+.paged-mode .answer-page-count,.paged-mode .answer-page-dots{opacity:calc(1 - var(--clean-progress))}
+.paged-mode .clean-page-count{display:block;position:absolute;bottom:24px;left:0;right:0;text-align:center;font-size:12px;line-height:20px;color:var(--dots-description);opacity:var(--clean-progress);pointer-events:none}
+.paged-clean>.note-header,.paged-clean>.engage-bar,.paged-clean .ai-footer,.paged-clean .answer-page-dots{pointer-events:none}
+.paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}
+.paged-mode .note-scroll img{-webkit-user-drag:none}
 .scheme-annotations{position:fixed;inset:0;pointer-events:none;z-index:40;color:#1768e8}
 .scheme-annotations[hidden],.scheme-annotation[hidden]{display:none}
 .scheme-annotation>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -246,7 +260,7 @@
             </div>
           </div>
         </div>
-        <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话"></div><span id="answerPageCount" class="answer-page-count" hidden></span>
+        <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话"></div><span id="answerPageCount" class="answer-page-count" hidden></span><span id="cleanPageCount" class="clean-page-count" aria-hidden="true"></span>
         <footer class="ai-footer"><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button></footer>
       </article>
     </div>
@@ -742,7 +756,7 @@ updateProgress();
 </script><script>// A second note entry shares the conversation, but paginates its content into cards.
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
-let isPagedNote=false,answerPageIndex=0,pageBuildSize='',pageDrag=null;
+let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -759,6 +773,7 @@ function selectAnswerPage(index,animate=true){
 function refreshAnswerPage(){
   const total=pageTrack.children.length;
   pageCount.textContent=(answerPageIndex+1)+'/'+total;
+  $('#cleanPageCount').textContent=(answerPageIndex+1)+' / '+total;
   const start=Math.max(0,Math.min(answerPageIndex-2,total-5));
   [...pageDots.children].forEach((button,slot)=>{
     const index=start+slot;
@@ -858,7 +873,10 @@ function buildAnswerPages(){
   selectAnswerPage(previous,false);
 }
 function setNotePagination(enabled){
+  resetPagedReader();
   isPagedNote=enabled;$('.ai-card').classList.toggle('paged-note',enabled);
+  $('.phone').classList.toggle('paged-mode',enabled);
+  if(enabled){measurePagedReader();setPagedCleanState(false)}
   answer.hidden=enabled;pageTrack.hidden=!enabled;pageDots.hidden=!enabled;pageCount.hidden=!enabled;
   noteCopy.textContent=enabled?'和朋友的暑假伊犁环线计划，点点帮我们整理好了，左右滑动上面的卡片查看完整攻略。':originalNoteCopy;
   commentCopy.textContent=enabled?'左右翻页看攻略，好方便！':originalCommentCopy;
@@ -873,25 +891,178 @@ pageTrack.addEventListener('scroll',()=>{
   if(!isPagedNote)return;
   answerPageIndex=Math.round(pageTrack.scrollLeft/pageTrack.clientWidth);refreshAnswerPage();
 },{passive:true});
-pageTrack.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}});
-pageTrack.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,a'))return;
-  pageDrag={x:e.clientX,y:e.clientY,left:pageTrack.scrollLeft,id:e.pointerId};
+pageTrack.addEventListener('keydown',e=>{
+  if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}
+  else if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePagedReader()}
 });
-pageTrack.addEventListener('pointermove',e=>{
-  if(!pageDrag)return;const dx=e.clientX-pageDrag.x;
-  if(Math.abs(dx)<5)return;
-  pageTrack.setPointerCapture(e.pointerId);pageTrack.classList.add('dragging');
-  pageTrack.scrollLeft=pageDrag.left-dx/(pageTrack.getBoundingClientRect().width/pageTrack.offsetWidth);
-});
-function finishPageDrag(e){
-  if(!pageDrag)return;
-  const delta=e.clientX-pageDrag.x,initial=Math.round(pageDrag.left/pageTrack.clientWidth);
-  pageDrag=null;pageTrack.classList.remove('dragging');
-  selectAnswerPage(initial+(Math.abs(delta)>35?(delta<0?1:-1):0));
-}
-pageTrack.addEventListener('pointerup',finishPageDrag);pageTrack.addEventListener('pointercancel',()=>{pageDrag=null;pageTrack.classList.remove('dragging');selectAnswerPage(answerPageIndex)});
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);
+</script><script>// The same paginated cards move between normal and clean reading.
+// Their dimensions stay fixed so a mode change never repaginates the answer.
+const pagedPhone=$('.phone'),pagedMedia=$('.media-area'),pagedHeader=$('.phone>.note-header'),pagedEngage=$('.phone>.engage-bar');
+let pagedClean=false,cleanProgress=0,pagedFrame=0,pagedGesture=null,pagedWheelTimer=0;
+let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
+const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+
+function measurePagedReader(){
+  pagedBaseHeight=matchMedia('(max-width:480px)').matches?Math.max(450,Math.min(570,pagedPhone.clientWidth*4/3)):524;
+  const pageHeight=pagedBaseHeight-44,phoneHeight=pagedPhone.clientHeight;
+  pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
+  pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
+  pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');
+  pagedPhone.style.setProperty('--paged-page-height',pageHeight+'px');
+  pagedPhone.style.setProperty('--paged-growth',(phoneHeight-pagedBaseHeight)+'px');
+  pagedPhone.style.setProperty('--paged-center',Math.max(0,(phoneHeight-pageHeight)/2)+'px');
+}
+function paintPagedReader(progress){
+  cleanProgress=progress;
+  pagedPhone.style.setProperty('--clean-progress',String(progress));
+}
+function setPagedCleanState(clean){
+  pagedClean=clean;
+  pagedPhone.dataset.readingMode=clean?'clean':'normal';
+  pagedPhone.classList.toggle('paged-clean',clean);
+  pagedHeader.inert=clean;pagedEngage.inert=clean;
+  $('.paged-note .ai-footer').inert=clean;pageDots.inert=clean;
+  pageCount.setAttribute('aria-hidden',String(clean));
+  pageTrack.setAttribute('aria-label',clean?'清屏阅读：左右翻页，轻点恢复操作栏，上滑查看笔记与评论':'左右滑动阅读新疆旅行对话，轻点进入清屏');
+}
+function animatePagedReader(clean,scrollTop=0){
+  cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
+  const startProgress=cleanProgress,startScroll=note.scrollTop,start=performance.now();
+  const duration=reducedPagedMotion.matches?0:340;
+  setPagedCleanState(clean);
+  function step(now){
+    const fraction=duration?Math.min(1,(now-start)/duration):1;
+    const eased=1-Math.pow(1-fraction,3);
+    paintPagedReader(startProgress+((clean?1:0)-startProgress)*eased);
+    note.scrollTop=startScroll+(scrollTop-startScroll)*eased;
+    if(fraction<1)pagedFrame=requestAnimationFrame(step);
+    else{pagedFrame=0;pageTrack.classList.remove('dragging');refreshAnswerPage()}
+  }
+  pagedFrame=requestAnimationFrame(step);
+}
+function togglePagedReader(){
+  if(!isPagedNote||pagedPhone.dataset.view!=='note'||!askOverlay.hidden)return;
+  animatePagedReader(!pagedClean);
+}
+function revealPagedDetails(){
+  ignorePagedWheelUntil=performance.now()+400;
+  // Aim for a narrow card strip; native scroll bounds avoid blank space after short comments.
+  animatePagedReader(false,pagedBaseHeight-24);
+}
+function resetPagedReader(){
+  cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
+  pagedFrame=0;pagedGesture=null;pagedClean=false;ignorePagedClickUntil=0;ignorePagedWheelUntil=0;
+  paintPagedReader(0);
+  pagedPhone.classList.remove('paged-clean','paged-dragging');
+  delete pagedPhone.dataset.readingMode;
+  pageTrack.classList.remove('dragging');pageTrack.style.translate='';
+  pagedHeader.inert=false;pagedEngage.inert=false;pageDots.inert=false;
+  $('.ai-footer').inert=false;
+}
+function pagedScale(){return pagedPhone.getBoundingClientRect().width/pagedPhone.offsetWidth||1}
+function pagedInteractive(target){return target.closest('button:not(:disabled),a,input,textarea')}
+function pageBoundaryReturn(){
+  const from=pageTrack.style.translate;
+  pageTrack.style.translate='';
+  if(from&&!reducedPagedMotion.matches)pageTrack.animate([{translate:from},{translate:'0px 0px'}],{duration:220,easing:'ease-out'});
+}
+function releasePagedPointer(event){
+  if(note.hasPointerCapture(event.pointerId))note.releasePointerCapture(event.pointerId);
+  pagedPhone.classList.remove('paged-dragging');
+}
+
+note.addEventListener('pointerdown',event=>{
+  if(!isPagedNote||pagedPhone.dataset.view!=='note'||event.button!==0||!event.isPrimary||pagedInteractive(event.target))return;
+  cancelAnimationFrame(pagedFrame);pagedFrame=0;clearTimeout(pagedWheelTimer);
+  // Freeze an interrupted native smooth snap before beginning a new gesture.
+  pageTrack.scrollTo({left:pageTrack.scrollLeft,behavior:'instant'});
+  pagedGesture={id:event.pointerId,x:event.clientX,y:event.clientY,scale:pagedScale(),axis:null,
+    card:!!event.target.closest('.media-area'),clean:pagedClean,left:pageTrack.scrollLeft,
+    top:note.scrollTop,index:answerPageIndex,lastX:event.clientX,lastY:event.clientY,
+    lastTime:performance.now(),vx:0,vy:0};
+});
+note.addEventListener('pointermove',event=>{
+  const g=pagedGesture;if(!g||event.pointerId!==g.id)return;
+  const dx=(event.clientX-g.x)/g.scale,dy=(event.clientY-g.y)/g.scale;
+  if(!g.axis){
+    if(Math.max(Math.abs(dx),Math.abs(dy))<7)return;
+    if(g.card&&Math.abs(dx)>Math.abs(dy)*1.15)g.axis='x';
+    else if(Math.abs(dy)>Math.abs(dx)*1.15)g.axis='y';
+    else return;
+    note.setPointerCapture(event.pointerId);pagedPhone.classList.add('paged-dragging');
+    if(g.axis==='x')pageTrack.classList.add('dragging');
+  }
+  event.preventDefault();
+  const now=performance.now(),elapsed=Math.max(1,now-g.lastTime);
+  g.vx=(event.clientX-g.lastX)/g.scale/elapsed;
+  g.vy=(g.lastY-event.clientY)/g.scale/elapsed;
+  g.lastX=event.clientX;g.lastY=event.clientY;g.lastTime=now;
+  if(g.axis==='x'){
+    const max=pageTrack.scrollWidth-pageTrack.clientWidth,wanted=g.left-dx;
+    pageTrack.scrollLeft=Math.max(0,Math.min(max,wanted));
+    pageTrack.style.translate=(wanted<0?Math.min(28,-wanted*.25):wanted>max?-Math.min(28,(wanted-max)*.25):0)+'px 0px';
+  }else{
+    note.scrollTop=Math.max(0,g.top-dy);
+    // A deliberate fast upward swipe commits immediately; slow drags stay clean until release.
+    if(g.clean&&-dy>32&&g.vy>.65){
+      ignorePagedClickUntil=now+350;pagedGesture=null;releasePagedPointer(event);revealPagedDetails();
+    }
+  }
+},{passive:false});
+function finishPagedGesture(event,cancelled=false){
+  const g=pagedGesture;if(!g||event.pointerId!==g.id)return;
+  pagedGesture=null;releasePagedPointer(event);
+  if(!g.axis)return;
+  ignorePagedClickUntil=performance.now()+350;
+  const stale=performance.now()-g.lastTime>100;
+  if(g.axis==='x'){
+    const dx=(event.clientX-g.x)/g.scale,vx=stale?0:g.vx;
+    pageBoundaryReturn();pageTrack.classList.remove('dragging');
+    const move=!cancelled&&(Math.abs(dx)>pageTrack.clientWidth*.12||(Math.abs(dx)>12&&Math.abs(vx)>.45));
+    selectAnswerPage(g.index+(move?(dx<0?1:-1):0));
+  }else if(g.clean){
+    if(!cancelled&&note.scrollTop>pagedPhone.clientHeight*.2)revealPagedDetails();
+    else animatePagedReader(true,0);
+  }else{
+    // Mouse and touch both retain a short, bounded glide after a normal vertical flick.
+    const velocity=cancelled||stale?0:g.vy;
+    const target=Math.max(0,Math.min(note.scrollHeight-note.clientHeight,note.scrollTop+Math.max(-260,Math.min(260,velocity*160))));
+    animatePagedReader(false,target);
+  }
+}
+note.addEventListener('pointerup',event=>finishPagedGesture(event));
+note.addEventListener('pointercancel',event=>finishPagedGesture(event,true));
+note.addEventListener('click',event=>{
+  if(!isPagedNote)return;
+  if(performance.now()<ignorePagedClickUntil){event.preventDefault();event.stopPropagation();return}
+  if(event.target.closest('.media-area')&&!pagedInteractive(event.target))togglePagedReader();
+},true);
+note.addEventListener('wheel',event=>{
+  if(!isPagedNote||pagedPhone.dataset.view!=='note'||!askOverlay.hidden)return;
+  if(performance.now()<ignorePagedWheelUntil){event.preventDefault();return}
+  const unit=event.deltaMode===1?16:event.deltaMode===2?note.clientHeight:1;
+  const dx=event.deltaX*unit,dy=event.deltaY*unit;
+  if(Math.abs(dx)>Math.abs(dy)&&event.target.closest('.media-area')){
+    event.preventDefault();cancelAnimationFrame(pagedFrame);pagedFrame=0;
+    pageTrack.classList.add('dragging');pageTrack.scrollLeft+=dx;
+    clearTimeout(pagedWheelTimer);
+    pagedWheelTimer=setTimeout(()=>{pageTrack.classList.remove('dragging');selectAnswerPage(Math.round(pageTrack.scrollLeft/pageTrack.clientWidth))},120);
+  }else if(pagedClean){
+    event.preventDefault();cancelAnimationFrame(pagedFrame);pagedFrame=0;
+    note.scrollTop=Math.max(0,note.scrollTop+dy);
+    clearTimeout(pagedWheelTimer);
+    if(dy>45&&note.scrollTop>32)revealPagedDetails();
+    else pagedWheelTimer=setTimeout(()=>note.scrollTop>pagedPhone.clientHeight*.2?revealPagedDetails():animatePagedReader(true),140);
+  }
+},{passive:false});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&isPagedNote&&pagedClean&&askOverlay.hidden){event.preventDefault();animatePagedReader(false)}
+});
+window.addEventListener('resize',()=>{
+  if(!isPagedNote)return;
+  cancelAnimationFrame(pagedFrame);pagedFrame=0;measurePagedReader();paintPagedReader(pagedClean?1:0);
+});
 </script><script>// Keep the existing detail surfaces mounted so back navigation preserves reading positions.
 const feedPage=$('#feedPage'),feedScroll=$('#feedScroll'),feedTarget=$('#feedTarget');
 const detailSurfaces=[...$('.phone').children].filter(el=>el!==feedPage);
@@ -902,6 +1073,7 @@ function captureNoteSurface(){
   return demoMotion.capture(detailSurfaces.filter(el=>el.matches('.note-header,.note-scroll,.engage-bar')),{surface:'phone'});
 }
 function setFeedVisible(show,animate=true){
+  if(show)resetPagedReader();
   const token=++feedTransitionToken;
   feedTransition?.cancel();
   // Keep the feed stationary behind the expanding or collapsing note snapshot.

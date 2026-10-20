@@ -1,7 +1,7 @@
 // A second note entry shares the conversation, but paginates its content into cards.
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
-let isPagedNote=false,answerPageIndex=0,pageBuildSize='',pageDrag=null;
+let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -18,6 +18,7 @@ function selectAnswerPage(index,animate=true){
 function refreshAnswerPage(){
   const total=pageTrack.children.length;
   pageCount.textContent=(answerPageIndex+1)+'/'+total;
+  $('#cleanPageCount').textContent=(answerPageIndex+1)+' / '+total;
   const start=Math.max(0,Math.min(answerPageIndex-2,total-5));
   [...pageDots.children].forEach((button,slot)=>{
     const index=start+slot;
@@ -117,7 +118,10 @@ function buildAnswerPages(){
   selectAnswerPage(previous,false);
 }
 function setNotePagination(enabled){
+  resetPagedReader();
   isPagedNote=enabled;$('.ai-card').classList.toggle('paged-note',enabled);
+  $('.phone').classList.toggle('paged-mode',enabled);
+  if(enabled){measurePagedReader();setPagedCleanState(false)}
   answer.hidden=enabled;pageTrack.hidden=!enabled;pageDots.hidden=!enabled;pageCount.hidden=!enabled;
   noteCopy.textContent=enabled?'和朋友的暑假伊犁环线计划，点点帮我们整理好了，左右滑动上面的卡片查看完整攻略。':originalNoteCopy;
   commentCopy.textContent=enabled?'左右翻页看攻略，好方便！':originalCommentCopy;
@@ -132,22 +136,8 @@ pageTrack.addEventListener('scroll',()=>{
   if(!isPagedNote)return;
   answerPageIndex=Math.round(pageTrack.scrollLeft/pageTrack.clientWidth);refreshAnswerPage();
 },{passive:true});
-pageTrack.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}});
-pageTrack.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,a'))return;
-  pageDrag={x:e.clientX,y:e.clientY,left:pageTrack.scrollLeft,id:e.pointerId};
+pageTrack.addEventListener('keydown',e=>{
+  if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}
+  else if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePagedReader()}
 });
-pageTrack.addEventListener('pointermove',e=>{
-  if(!pageDrag)return;const dx=e.clientX-pageDrag.x;
-  if(Math.abs(dx)<5)return;
-  pageTrack.setPointerCapture(e.pointerId);pageTrack.classList.add('dragging');
-  pageTrack.scrollLeft=pageDrag.left-dx/(pageTrack.getBoundingClientRect().width/pageTrack.offsetWidth);
-});
-function finishPageDrag(e){
-  if(!pageDrag)return;
-  const delta=e.clientX-pageDrag.x,initial=Math.round(pageDrag.left/pageTrack.clientWidth);
-  pageDrag=null;pageTrack.classList.remove('dragging');
-  selectAnswerPage(initial+(Math.abs(delta)>35?(delta<0?1:-1):0));
-}
-pageTrack.addEventListener('pointerup',finishPageDrag);pageTrack.addEventListener('pointercancel',()=>{pageDrag=null;pageTrack.classList.remove('dragging');selectAnswerPage(answerPageIndex)});
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);
