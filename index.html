@@ -168,8 +168,9 @@
 .paged-mode>.engage-bar{position:absolute;left:0;right:0;bottom:0;transform:translateY(calc(100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
 .paged-mode>.note-scroll{position:absolute;left:0;right:0;top:calc(var(--paged-header) * (1 - var(--clean-progress)));bottom:calc(var(--paged-bottom) * (1 - var(--clean-progress)));background:#fff;touch-action:pinch-zoom;overflow-anchor:none}
 .paged-mode .media-area{height:calc(var(--paged-base-height) + var(--paged-growth) * var(--clean-progress));min-height:0;max-height:none}
+.paged-mode .ai-card{overflow:clip}
 .paged-mode .answer-pages{flex:none;height:var(--paged-page-height);transform:translateY(calc(var(--paged-center) * var(--clean-progress)));touch-action:pinch-zoom}
-.paged-mode .ai-footer{position:absolute;bottom:0;left:0;right:0;opacity:calc(1 - var(--clean-progress))}
+.paged-mode .ai-footer{position:sticky;bottom:0;left:0;right:0;opacity:calc(1 - var(--clean-progress));background:linear-gradient(to bottom,rgba(245,245,245,0),var(--dots-bg-0) 30%)}
 .paged-mode .answer-page-count,.paged-mode .answer-page-dots{opacity:calc(1 - var(--clean-progress))}
 .paged-mode .clean-page-count{display:block;position:absolute;bottom:24px;left:0;right:0;text-align:center;font-size:12px;line-height:20px;color:var(--dots-description);opacity:var(--clean-progress);pointer-events:none}
 .paged-clean>.note-header,.paged-clean>.engage-bar,.paged-clean .ai-footer,.paged-clean .answer-page-dots{pointer-events:none}
@@ -904,8 +905,10 @@ let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
 const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 
 function measurePagedReader(){
-  pagedBaseHeight=matchMedia('(max-width:480px)').matches?Math.max(450,Math.min(570,pagedPhone.clientWidth*4/3)):524;
-  const pageHeight=pagedBaseHeight-44,phoneHeight=pagedPhone.clientHeight;
+  const phoneHeight=pagedPhone.clientHeight;
+  // Paginate against a tall screen-sized canvas in both modes. Only the chrome moves.
+  const pageHeight=Math.max(280,phoneHeight-68);
+  pagedBaseHeight=pageHeight+44;
   pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');

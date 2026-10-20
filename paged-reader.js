@@ -6,8 +6,10 @@ let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
 const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 
 function measurePagedReader(){
-  pagedBaseHeight=matchMedia('(max-width:480px)').matches?Math.max(450,Math.min(570,pagedPhone.clientWidth*4/3)):524;
-  const pageHeight=pagedBaseHeight-44,phoneHeight=pagedPhone.clientHeight;
+  const phoneHeight=pagedPhone.clientHeight;
+  // Paginate against a tall screen-sized canvas in both modes. Only the chrome moves.
+  const pageHeight=Math.max(280,phoneHeight-68);
+  pagedBaseHeight=pageHeight+44;
   pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');
