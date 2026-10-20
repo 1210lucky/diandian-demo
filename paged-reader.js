@@ -19,6 +19,13 @@ function paintPagedReader(progress){
   cleanProgress=progress;
   pagedPhone.style.setProperty('--clean-progress',String(progress));
 }
+function stopPagedAnimation(){
+  if(!pagedFrame)return;
+  cancelAnimationFrame(pagedFrame);pagedFrame=0;
+  // A new gesture must not freeze the controls halfway through their entrance/exit.
+  paintPagedReader(pagedClean?1:0);
+  if(pagedClean)note.scrollTop=0;
+}
 function setPagedCleanState(clean){
   pagedClean=clean;
   pagedPhone.dataset.readingMode=clean?'clean':'normal';
@@ -76,7 +83,7 @@ function releasePagedPointer(event){
 
 note.addEventListener('pointerdown',event=>{
   if(!isPagedNote||pagedPhone.dataset.view!=='note'||event.button!==0||!event.isPrimary||pagedInteractive(event.target))return;
-  cancelAnimationFrame(pagedFrame);pagedFrame=0;clearTimeout(pagedWheelTimer);
+  stopPagedAnimation();clearTimeout(pagedWheelTimer);
   // Freeze an interrupted native smooth snap before beginning a new gesture.
   pageTrack.scrollTo({left:pageTrack.scrollLeft,behavior:'instant'});
   pagedGesture={id:event.pointerId,x:event.clientX,y:event.clientY,scale:pagedScale(),axis:null,
@@ -146,12 +153,12 @@ note.addEventListener('wheel',event=>{
   const unit=event.deltaMode===1?16:event.deltaMode===2?note.clientHeight:1;
   const dx=event.deltaX*unit,dy=event.deltaY*unit;
   if(Math.abs(dx)>Math.abs(dy)&&event.target.closest('.media-area')){
-    event.preventDefault();cancelAnimationFrame(pagedFrame);pagedFrame=0;
+    event.preventDefault();stopPagedAnimation();
     pageTrack.classList.add('dragging');pageTrack.scrollLeft+=dx;
     clearTimeout(pagedWheelTimer);
     pagedWheelTimer=setTimeout(()=>{pageTrack.classList.remove('dragging');selectAnswerPage(Math.round(pageTrack.scrollLeft/pageTrack.clientWidth))},120);
   }else if(pagedClean){
-    event.preventDefault();cancelAnimationFrame(pagedFrame);pagedFrame=0;
+    event.preventDefault();stopPagedAnimation();
     note.scrollTop=Math.max(0,note.scrollTop+dy);
     clearTimeout(pagedWheelTimer);
     if(dy>45&&note.scrollTop>32)revealPagedDetails();
