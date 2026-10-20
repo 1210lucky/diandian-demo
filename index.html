@@ -149,33 +149,39 @@
 .page-block>h4{margin:0 0 10px}
 .page-block .response-status{margin-bottom:14px}
 /* Each horizontal page is a complete card, including both rounded edges. */
-.page-response.continues{flex-grow:1}
+.page-response.continues{flex-grow:0}
 .page-response.last-response{flex-grow:0}
 .ai-card .answer-actions{display:none}
 .answer-page .text-continues{border-bottom-left-radius:0;border-bottom-right-radius:0}
 .answer-page .text-continuation{border-top-left-radius:0;border-top-right-radius:0}
 .answer-page-count{position:absolute;right:10px;top:10px;background:#0005;color:white;font-size:11px;line-height:18px;border-radius:12px;padding:2px 7px;pointer-events:none}
-.paged-note .ai-footer{position:relative;min-height:44px;height:44px;flex-shrink:0;padding:6px 16px 10px;background:var(--dots-bg-0);gap:12px}
-.answer-page-dots{height:24px;display:flex;align-items:center;justify-content:center;gap:4px;background:#fff;pointer-events:auto}
+.paged-note .ai-footer{position:relative;min-height:56px;height:56px;flex-shrink:0;padding:0 16px;display:grid;grid-template-rows:32px 24px;justify-content:stretch;gap:0;background:var(--dots-bg-0)}
+.paged-note .view-conversation{justify-self:end;align-self:center}
+.answer-page-dots{height:24px;display:flex;align-items:center;justify-content:center;gap:4px;background:transparent;pointer-events:auto}
 .answer-page-dots button{width:5px;height:24px;padding:0;position:relative}
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
-/* Clean reading keeps the original page geometry, including its text and image cuts. */
+/* Normal and clean reading use their available height and share a content anchor. */
 .clean-page-count{display:none}
 .phone.paged-mode{--clean-progress:0;background:var(--dots-bg-0)}
 .paged-mode>.note-header{position:absolute;left:0;right:0;top:0;transform:translateY(calc(-100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
 .paged-mode>.engage-bar{position:absolute;left:0;right:0;bottom:0;transform:translateY(calc(100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
 .paged-mode>.note-scroll{position:absolute;left:0;right:0;top:calc(var(--paged-header) * (1 - var(--clean-progress)));bottom:calc(var(--paged-bottom) * (1 - var(--clean-progress)));background:#fff;touch-action:pinch-zoom;overflow-anchor:none}
 .paged-mode .media-area{height:calc(var(--paged-base-height) + var(--paged-growth) * var(--clean-progress));min-height:0;max-height:none}
-.paged-mode .ai-card{overflow:clip}
+.paged-mode .ai-card{overflow:hidden}
 .paged-mode .answer-pages{flex:none;height:var(--paged-page-height);transform:translateY(calc(var(--paged-center) * var(--clean-progress)));touch-action:pinch-zoom}
-.paged-mode .ai-footer{position:sticky;bottom:0;left:0;right:0;opacity:calc(1 - var(--clean-progress));background:linear-gradient(to bottom,rgba(245,245,245,0),var(--dots-bg-0) 30%)}
+.paged-mode .ai-footer{opacity:calc(1 - var(--clean-progress))}
+.paged-clean .ai-footer{visibility:hidden}
 .paged-mode .answer-page-count,.paged-mode .answer-page-dots{opacity:calc(1 - var(--clean-progress))}
-.paged-mode .clean-page-count{display:block;position:absolute;bottom:24px;left:0;right:0;text-align:center;font-size:12px;line-height:20px;color:var(--dots-description);opacity:var(--clean-progress);pointer-events:none}
+.paged-mode .clean-page-count{display:block;position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:12px;line-height:20px;color:var(--dots-description);opacity:var(--clean-progress);pointer-events:none}
 .paged-clean>.note-header,.paged-clean>.engage-bar,.paged-clean .ai-footer,.paged-clean .answer-page-dots{pointer-events:none}
 .paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}
-.paged-mode .note-scroll img{-webkit-user-drag:none}
+.phone>.note-scroll img{-webkit-user-drag:none}
+/* Vertical notes keep their original card size; full-reader taps never toggle it closed. */
+.phone:not(.paged-mode)>.note-scroll,.phone:not(.paged-mode) .answer-scroll{touch-action:pinch-zoom}
+.vertical-reading.reading-mode .sheet-space{touch-action:pan-y}
+.vertical-reading.reading-mode .sheet-space img{-webkit-user-drag:none}
 .scheme-annotations{position:fixed;inset:0;pointer-events:none;z-index:40;color:#1768e8}
 .scheme-annotations[hidden],.scheme-annotation[hidden]{display:none}
 .scheme-annotation>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -262,10 +268,9 @@
           </div>
         </div>
         <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话"></div><span id="answerPageCount" class="answer-page-count" hidden></span><span id="cleanPageCount" class="clean-page-count" aria-hidden="true"></span>
-        <footer class="ai-footer"><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button></footer>
+        <footer class="ai-footer"><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button><nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav></footer>
       </article>
     </div>
-    <nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav>
     <section class="note-body"><h2>新疆旅游攻略</h2><p>和朋友的暑假伊犁环线计划，点点帮我们整理好了，直接在上面的卡片里上下滑动看完整攻略。</p><p class="hashtags">#有问题问点点 #点点AI #新疆旅游</p><p class="timestamp">编辑于 今天  ·  上海</p></section>
     <section class="comments" id="comments"><p class="comment-count">共 <span id="commentCount">2</span> 条评论</p><div class="comment"><img src="data:image/webp;base64,UklGRsAEAABXRUJQVlA4WAoAAAAQAAAARwAARwAAQUxQSFcBAAABr0CQbZv6CDaDR0QsEbFCXmGQZdtq21AXdyMrUZCY/2DdJMErnxH9nwC0pInjV0RVVX4p8gKTxKno+7QPnREnrZ72jigUbSrH0AeFos3l6GHJ2qUsrShqt5GajFk7lqHBUrTrslVj7Z4rBTV4VGE1yRU2Nbq8GouVMrygrGaFnkU1HB8tanp5km0J3QU1ftyM2Vqhq6Dmj6tsr9BpVwf5lDxIAEZ1kYDdBwaSDwlQHwstTujEXnD04pO8+P68EHFD/3uKF+LG7+tFil582AuevVipOAEkHxLAPuwA+TAASB4kAGAP9hMVe4LLYO+4omJNhisEawduKdsSPFxsrU8QLX3wmLIdoWcYi5Uy4O1iZcN7tsGoGSwcqMv9MWpvpa+yov6Ye5IBLSn28yE0XnIfsqLDkNuVQOhyDLlNCYR+91QvMaHvcU8VSmKCyZVj+slJ5Bt5JrQEAFZQOCBCAwAAsBIAnQEqSABIAD6ROJZIJaMiITMzPACwEglAF5vBq5fQLNvOEngbc67ld52YDU8lDfBSYcInZtXXN+ow0Ulqg5kwFzUThi7Y4qr5XLoTs9JQpo0T+kqq5O9OX8Ed+4xLye21LUtzz7TWukMn6M/bqEmL0rq3oZpFM3UU84a0hfYUYeRBAH56ytfL4siOSje0AzYGE7GDf2iL4rQ7GIAA/v72Xf75Wf/cB4Flv/fBlYEv5kMUJVP0Z58ckd6dHAMP+viyF0NyICg/Jq4YxvN3Vq01fRmEbUNKxfHLuylQAqUc2aVYnv747e9L/dOO7viceV+fYlL3QL4+UdzqFg5yzdQoQqO0owfSuWWVRUdqNEz3bx1FRkkVkalWuxIUOClPa0wuBn7nP36n+RxP//6AoWDf3bRP72qRefzuYnDq6X5CT4zhpNY6ZLE6RpdZpdNpuzmBAUJblWj9CoR1TT/qdqw+CRUU71nwPAl++Rap+A2brjmM2s6nC/BqM6qC84eWkjIXsUCYFePHF3MfIjcKcPpdUUCOj7iGc87mHUz/GAWLN3CUKLsCg/s91EjDLa84rbThEe0o/YDARTIPsh1m7qakMpLdoUrKDw6w7qZC92zQcwdQgSXR82JXwg2/Kv2A1xBNKTdMmCsHfsb3xyBwx2xVJV4FPDjCEcIYehEhvQYIfl4I07sY/hWl/ZNrTIwWeWvpmpZSiidUb2en+YhDp1mS6j86Xzw1kHTSz0fSINAmiWQt1wY58xQAjYRW+CikOftBh5UP6QJ0i40GFoupe5CBaRQO/sKzwHWCMSaQMw4mY7mcxZvSwmGtxSNB7QRtB14qfrMPXrYTa4YpCcg66UMNdfF6/RogcOMxJ6QYsUTo0VLT7z2cfeW8aaHe7Bkxhq5TrtxNBtMvJqwUeZQKQY7cdjfcHaNsc8I4SotDL3z5qF2ypHD8lCf/Y5//9a0Wbmo4Vx+C+XgKrYMhkemP777GdT7W9kCOd5jY2431du6Rxzbzc8M5wcskWD5StRNf3ifHHAbhzJD9lPMRDwx7AMDOOvq+eQhDOgRXy9OCUP4ugpExGZesBHRyfvckNyvJousu//hORY6fTW//kXAAAAAA" alt="" width="34" height="34"><div><span>小周同学</span><p>可以在图里面往下滑诶！</p><small>今天 · 上海</small></div></div><div class="comment"><span class="letter-avatar">L</span><div><span>栗子</span><p>想看看沿途的草原和雪山</p><small>今天 · 北京</small></div></div><div id="newComments"></div><p class="end-note">— 到底了 —</p></section>
   </div>
@@ -541,11 +546,6 @@ function updateProgress(){if($('.phone').dataset.view==='feed'){$('#guideState')
 answer.addEventListener('scroll',updateProgress,{passive:true});new ResizeObserver(updateProgress).observe(answer);
 function jumpTo(el){const scale=answer.getBoundingClientRect().height/answer.offsetHeight;answer.scrollTo({top:answer.scrollTop+(el.getBoundingClientRect().top-answer.getBoundingClientRect().top)/scale,behavior:smooth})}
 document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpTo(document.getElementById(b.dataset.jump))));
-let drag=null;
-answer.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,a,input'))return;drag={y:e.clientY,top:answer.scrollTop,moved:false,id:e.pointerId}});
-answer.addEventListener('pointermove',e=>{if(!drag)return;const delta=drag.y-e.clientY;if(Math.abs(delta)>4){drag.moved=true;answer.setPointerCapture(e.pointerId);answer.classList.add('dragging');answer.scrollTop=drag.top+delta/(answer.getBoundingClientRect().height/answer.offsetHeight)}});
-function endDrag(){drag=null;answer.classList.remove('dragging')}
-answer.addEventListener('pointerup',endDrag);answer.addEventListener('pointercancel',endDrag);window.addEventListener('pointerup',endDrag);
 $('#reset').addEventListener('click',()=>resetExperience());
 $('#back').addEventListener('click',()=>returnToFeed());
 $('#follow').addEventListener('click',e=>{const on=e.currentTarget.classList.toggle('followed');e.currentTarget.textContent=on?'已关注':'关注';toast(on?'已关注（演示）':'已取消关注（演示）')});
@@ -617,6 +617,7 @@ function setConversationMode(full,position='bottom'){
   askSheet.classList.remove('recommendation-mode','query-mode');$('#recommendedQueries').hidden=true;$('#followupMessages').replaceChildren();
   const reading=full&&typeof position==='object'&&position.reading===true;
   conversationMode=full;askSheet.classList.toggle('conversation-mode',full);askSheet.classList.toggle('reading-mode',reading);askSheet.classList.remove('keyboard-open');
+  askSheet.classList.toggle('vertical-reading',reading&&!window.pagedReadingPosition);
   $('#sharedConversation').hidden=!full&&!reading;$('#newTopic').hidden=!full||position!=='bottom';$('#expandAsk').hidden=full||reading;$('#readerFooter').hidden=!reading;
   $('#closeAsk').setAttribute('aria-label',full?'返回小红书笔记':reading?'关闭完整对话':'关闭问点点');
   const closeIcon=$('#closeAsk img'),titleIcon=$('#sheetTitle img');
@@ -671,8 +672,7 @@ function closeAsk(){
   questionInput.blur();
   const finish=()=>{
     if(token!==conversationEntryToken)return;
-    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
-    inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
+    finishAskClose();
   };
   if(conversationMode){
     const source=conversationSource();
@@ -680,6 +680,10 @@ function closeAsk(){
     askOverlay.style.visibility='hidden';
     conversationEntryAnimation=demoMotion.transition({fromRect,toRect:source.rect,fromSnapshot,toSnapshot:source.snapshot,onFinish:finish});
   }else{askOverlay.classList.remove('is-open');closeTimer=setTimeout(finish,smooth==='auto'?0:240)}
+}
+function finishAskClose(){
+  askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
+  inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
 }
 $('#viewConversation').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true}));
 let readerReturnScroll=0;
@@ -758,6 +762,7 @@ updateProgress();
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
 let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
+let pagedModeAnchor=null,pagedModeStartIndex=0;
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -765,6 +770,12 @@ function pageClone(source){
   clone.removeAttribute('id');
   clone.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
   return clone;
+}
+function textFragment(element,from,to){
+  const walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT),nodes=[];let n,offset=0;
+  while(n=walker.nextNode()){nodes.push({n,start:offset,end:offset+n.length});offset+=n.length}
+  const a=nodes.find(x=>x.end>from),b=nodes.find(x=>x.end>=to),range=document.createRange();
+  range.setStart(a.n,from-a.start);range.setEnd(b.n,to-b.start);return range.cloneContents();
 }
 function selectAnswerPage(index,animate=true){
   answerPageIndex=Math.max(0,Math.min(pageTrack.children.length-1,index));
@@ -786,17 +797,32 @@ function refreshAnswerPage(){
   [...pageTrack.children].forEach((page,i)=>page.inert=i!==answerPageIndex);
   if(isPagedNote&&$('.phone').dataset.view!=='feed')$('#guideState').textContent='左右翻页 · '+(answerPageIndex+1)+' / '+total;
 }
-function buildAnswerPages(){
+function capturePagedPosition(){
+  const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
+  return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
+}
+function pageAtPosition(position){
+  return [...pageTrack.children].findIndex(slide=>[...slide.querySelectorAll('[data-reading-anchor]')].some(block=>{
+    if(block.dataset.readingAnchor!==position.anchor)return false;
+    const start=Number(block.dataset.textStart||0);
+    return position.textIndex>=start&&position.textIndex<start+Math.max(1,block.textContent.length);
+  }));
+}
+function buildAnswerPages(position){
   const width=pageTrack.clientWidth,height=pageTrack.clientHeight;
   if(!width||!height)return;
-  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length)return;
+  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length&&!position)return;
   pageBuildSize=size;const previous=answerPageIndex;pageTrack.replaceChildren();pageDots.replaceChildren();
   let page,body,response;
   const newPage=()=>{
     page=document.createElement('section');page.className='answer-page';
     body=document.createElement('div');body.className='answer-page-body';page.append(body);pageTrack.append(page);response=null;
   };
-  const fits=()=>body.scrollHeight<=body.clientHeight+1;
+  // Measure rendered boxes, including padding, so desktop CSS zoom cannot shift the cut.
+  const fits=()=>{
+    const limit=body.getBoundingClientRect().bottom;
+    return [...body.children].every(child=>child.getBoundingClientRect().bottom<=limit+.25);
+  };
   const responseShell=()=>{
     response=document.createElement('div');response.className='dots-response page-response dots-markdown';body.append(response);return response;
   };
@@ -814,18 +840,41 @@ function buildAnswerPages(){
       copy.classList.add('text-continues');start=low;newPage();copy=pageClone(original);copy.classList.add('text-continuation');body.append(copy);
     }
   }
-  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')];
+  // On a size/mode change keep the visible passage at a page boundary. Reflow the
+  // surrounding content without sending the reader back to the start of a paragraph.
+  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')].flatMap(element=>{
+    if(!pagedClean||element.dataset.readingAnchor!==position?.anchor)return [element];
+    const at=position.textIndex||0,copy=pageClone(element);
+    if(at>0&&at<element.textContent.length&&element.matches('p')){
+      const before=pageClone(element);
+      before.replaceChildren(textFragment(element,0,at));
+      copy.replaceChildren(textFragment(element,at,element.textContent.length));
+      copy.dataset.textStart=String(at);copy.dataset.pageBreak='true';
+      return [before,copy];
+    }
+    copy.dataset.pageBreak='true';return [copy];
+  });
   // Keep a title/status with the beginning of its paragraph, not the entire paragraph.
   const groups=[];
   for(let i=0;i<originals.length;i++){
     const group=[originals[i]];
-    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p'))group.push(originals[++i]);
+    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p')&&!originals[i+1].dataset.pageBreak)group.push(originals[++i]);
     groups.push(group);
   }
   for(const group of groups){
+    if(group[0].dataset.pageBreak&&body.children.length)newPage();
     if(!response)responseShell();
     const wrapper=document.createElement('div');wrapper.className='page-block';group.forEach(el=>wrapper.append(pageClone(el)));response.append(wrapper);
     if(fits())continue;
+    // Keep the image group intact. If it only just misses the cut, fit three square
+    // thumbnails into the remaining space rather than leaving a large empty tail.
+    const images=wrapper.querySelector('.dots-media-image');
+    if(images){
+      const scale=page.getBoundingClientRect().width/page.offsetWidth||1;
+      const overflow=(response.getBoundingClientRect().bottom-body.getBoundingClientRect().bottom)/scale;
+      const tile=(images.clientWidth-12)/3-overflow-1;
+      if(tile>=72){images.style.width=(tile*3+12)+'px';images.style.marginInline='auto';if(fits())continue;images.style.width='';images.style.marginInline=''}
+    }
     if(wrapper.querySelector('p'))flowParagraph(wrapper);
     else moveBlock(wrapper);
   }
@@ -836,21 +885,16 @@ function buildAnswerPages(){
   }
   function flowParagraph(wrapper){
     let paragraph=wrapper.querySelector('p');if(!paragraph)return;
-    const original=paragraph.cloneNode(true);let start=0;
+    const original=paragraph.cloneNode(true),base=Number(paragraph.dataset.textStart||0);let start=0;
     const textLength=original.textContent.length;
-    function fragment(from,to){
-      const walker=document.createTreeWalker(original,NodeFilter.SHOW_TEXT),nodes=[];let n,offset=0;
-      while(n=walker.nextNode()){nodes.push({n,start:offset,end:offset+n.length});offset+=n.length}
-      const a=nodes.find(x=>x.end>from),b=nodes.find(x=>x.end>=to);const range=document.createRange();
-      range.setStart(a.n,from-a.start);range.setEnd(b.n,to-b.start);return range.cloneContents();
-    }
+    const fragment=(from,to)=>textFragment(original,from,to);
     while(start<textLength){
       let low=start,high=textLength;
       while(low<high){const mid=Math.ceil((low+high)/2);paragraph.replaceChildren(fragment(start,mid));if(fits())low=mid;else high=mid-1}
       // If even one complete line cannot fit, carry its heading/status to the next page.
       if(low===start){paragraph.replaceChildren(fragment(start,textLength));moveBlock(wrapper);continue}
       const end=low;
-      paragraph.replaceChildren(fragment(start,end));paragraph.dataset.textStart=String(start);
+      paragraph.replaceChildren(fragment(start,end));paragraph.dataset.textStart=String(base+start);
       if(end===textLength)break;
       response.classList.add('continues');newPage();responseShell();response.classList.add('continuation');
       wrapper=document.createElement('div');wrapper.className='page-block';response.append(wrapper);
@@ -871,7 +915,8 @@ function buildAnswerPages(){
       dot.addEventListener('click',()=>selectAnswerPage(Number(dot.dataset.page)));pageDots.append(dot);
     }
   });
-  selectAnswerPage(previous,false);
+  const located=position?pageAtPosition(position):-1;
+  selectAnswerPage(located<0?previous:located,false);
 }
 function setNotePagination(enabled){
   resetPagedReader();
@@ -882,10 +927,7 @@ function setNotePagination(enabled){
   noteCopy.textContent=enabled?'和朋友的暑假伊犁环线计划，点点帮我们整理好了，左右滑动上面的卡片查看完整攻略。':originalNoteCopy;
   commentCopy.textContent=enabled?'左右翻页看攻略，好方便！':originalCommentCopy;
   note.scrollTop=0;
-  window.pagedReadingPosition=enabled?()=>{
-    const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
-    return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
-  }:null;
+  window.pagedReadingPosition=enabled?capturePagedPosition:null;
   if(enabled)buildAnswerPages();
 }
 pageTrack.addEventListener('scroll',()=>{
@@ -897,8 +939,7 @@ pageTrack.addEventListener('keydown',e=>{
   else if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePagedReader()}
 });
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);
-</script><script>// The same paginated cards move between normal and clean reading.
-// Their dimensions stay fixed so a mode change never repaginates the answer.
+</script><script>// Each state paginates into its actual visible area, with a semantic reading anchor.
 const pagedPhone=$('.phone'),pagedMedia=$('.media-area'),pagedHeader=$('.phone>.note-header'),pagedEngage=$('.phone>.engage-bar');
 let pagedClean=false,cleanProgress=0,pagedFrame=0,pagedGesture=null,pagedWheelTimer=0;
 let ignorePagedClickUntil=0,ignorePagedWheelUntil=0,pagedBaseHeight=524;
@@ -906,15 +947,14 @@ const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 
 function measurePagedReader(){
   const phoneHeight=pagedPhone.clientHeight;
-  // Paginate against a tall screen-sized canvas in both modes. Only the chrome moves.
-  const pageHeight=Math.max(280,phoneHeight-68);
-  pagedBaseHeight=pageHeight+44;
+  pagedBaseHeight=phoneHeight-pagedHeader.offsetHeight-pagedEngage.offsetHeight;
+  const pageHeight=Math.max(240,pagedClean?phoneHeight-40:pagedBaseHeight-56);
   pagedPhone.style.setProperty('--paged-header',pagedHeader.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-bottom',pagedEngage.offsetHeight+'px');
   pagedPhone.style.setProperty('--paged-base-height',pagedBaseHeight+'px');
   pagedPhone.style.setProperty('--paged-page-height',pageHeight+'px');
   pagedPhone.style.setProperty('--paged-growth',(phoneHeight-pagedBaseHeight)+'px');
-  pagedPhone.style.setProperty('--paged-center',Math.max(0,(phoneHeight-pageHeight)/2)+'px');
+  pagedPhone.style.setProperty('--paged-center','12px');
 }
 function paintPagedReader(progress){
   cleanProgress=progress;
@@ -940,7 +980,22 @@ function animatePagedReader(clean,scrollTop=0){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   const startProgress=cleanProgress,startScroll=note.scrollTop,start=performance.now();
   const duration=reducedPagedMotion.matches?0:340;
-  setPagedCleanState(clean);
+  if(clean!==pagedClean){
+    const returningToEntry=!clean&&answerPageIndex===pagedModeStartIndex&&pagedModeAnchor;
+    const position=returningToEntry?pagedModeAnchor:capturePagedPosition();
+    if(clean)pagedModeAnchor=position;
+    setPagedCleanState(clean);measurePagedReader();buildAnswerPages(position);
+    if(clean)pagedModeStartIndex=answerPageIndex;
+    else if(!returningToEntry&&scrollTop===0){
+      const blocks=[...pageTrack.children[answerPageIndex].querySelectorAll('[data-reading-anchor]')];
+      const block=blocks.find(el=>el.dataset.readingAnchor===position.anchor&&
+        Number(el.dataset.textStart||0)<=position.textIndex&&Number(el.dataset.textStart||0)+Math.max(1,el.textContent.length)>position.textIndex);
+      if(block){
+        const point=block.matches('p,h4')?textPointAtIndex(block,position.textIndex-Number(block.dataset.textStart||0)):null;
+        scrollTop=Math.max(0,((point||block.getBoundingClientRect()).top-pageTrack.getBoundingClientRect().top)/pagedScale()-16);
+      }
+    }
+  }else setPagedCleanState(clean);
   function step(now){
     const fraction=duration?Math.min(1,(now-start)/duration):1;
     const eased=1-Math.pow(1-fraction,3);
@@ -963,6 +1018,7 @@ function revealPagedDetails(){
 function resetPagedReader(){
   cancelAnimationFrame(pagedFrame);clearTimeout(pagedWheelTimer);
   pagedFrame=0;pagedGesture=null;pagedClean=false;ignorePagedClickUntil=0;ignorePagedWheelUntil=0;
+  pagedModeAnchor=null;
   paintPagedReader(0);
   pagedPhone.classList.remove('paged-clean','paged-dragging');
   delete pagedPhone.dataset.readingMode;
@@ -1073,6 +1129,91 @@ window.addEventListener('resize',()=>{
   if(!isPagedNote)return;
   cancelAnimationFrame(pagedFrame);pagedFrame=0;measurePagedReader();paintPagedReader(pagedClean?1:0);
 });
+</script><script>// Vertical notes retain their compact card. A tap enters the existing Dots reader.
+// Reading gestures consume the answer first, then continue into the note and comments.
+const verticalPhone=$('.phone'),readerScroll=$('#conversationScroll');
+let verticalGesture=null,readerGesture=null,verticalClickUntil=0;
+const verticalScale=()=>verticalPhone.getBoundingClientRect().width/verticalPhone.offsetWidth||1;
+const scrollLimit=el=>Math.max(0,el.scrollHeight-el.clientHeight);
+const interactiveReadingTarget=target=>target.closest('button:not(:disabled),a,input,textarea');
+const verticalReaderOpen=()=>!askOverlay.hidden&&askSheet.matches('.vertical-reading.reading-mode');
+
+function consumeVerticalScroll(delta,inCard){
+  if(inCard&&note.scrollTop<=.5){
+    const before=answer.scrollTop;
+    answer.scrollTop=Math.max(0,Math.min(scrollLimit(answer),before+delta));
+    delta-=answer.scrollTop-before;
+  }
+  note.scrollTop=Math.max(0,Math.min(scrollLimit(note),note.scrollTop+delta));
+}
+note.addEventListener('pointerdown',event=>{
+  if(isPagedNote||verticalPhone.dataset.view!=='note'||!askOverlay.hidden||event.button!==0||!event.isPrimary||interactiveReadingTarget(event.target))return;
+  verticalGesture={id:event.pointerId,x:event.clientX,y:event.clientY,lastY:event.clientY,time:performance.now(),velocity:0,moved:false,card:!!event.target.closest('.media-area')};
+});
+note.addEventListener('pointermove',event=>{
+  const g=verticalGesture;if(!g||event.pointerId!==g.id)return;
+  if(!g.moved){
+    const dx=Math.abs(event.clientX-g.x),dy=Math.abs(event.clientY-g.y);
+    if(Math.max(dx,dy)<7)return;
+    g.horizontal=dx>dy*1.5;
+    g.moved=true;note.setPointerCapture(event.pointerId);answer.classList.add('dragging');
+  }
+  event.preventDefault();
+  if(g.horizontal)return;
+  const now=performance.now(),delta=(g.lastY-event.clientY)/verticalScale();
+  g.velocity=delta/Math.max(1,now-g.time);g.time=now;g.lastY=event.clientY;
+  consumeVerticalScroll(delta,g.card);
+},{passive:false});
+function finishVerticalNoteGesture(event,cancelled=false){
+  const g=verticalGesture;if(!g||g.id!==event.pointerId)return;
+  verticalGesture=null;answer.classList.remove('dragging');
+  if(note.hasPointerCapture(event.pointerId))note.releasePointerCapture(event.pointerId);
+  if(!g.moved)return;
+  verticalClickUntil=performance.now()+350;
+  const velocity=cancelled||performance.now()-g.time>100?0:g.velocity;
+  // Keep mouse/touch drags usable without launching another gesture on pointerup.
+  consumeVerticalScroll(Math.max(-180,Math.min(180,velocity*90)),g.card);
+}
+note.addEventListener('pointerup',event=>finishVerticalNoteGesture(event));
+note.addEventListener('pointercancel',event=>finishVerticalNoteGesture(event,true));
+note.addEventListener('wheel',event=>{
+  if(isPagedNote||!askOverlay.hidden||!event.target.closest('.media-area')||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+  event.preventDefault();
+  const unit=event.deltaMode===1?16:event.deltaMode===2?answer.clientHeight:1;
+  consumeVerticalScroll(event.deltaY*unit,true);
+},{passive:false});
+note.addEventListener('click',event=>{
+  if(isPagedNote||!askOverlay.hidden||interactiveReadingTarget(event.target))return;
+  if(performance.now()<verticalClickUntil){event.preventDefault();event.stopPropagation();return}
+  if(!event.target.closest('.media-area'))return;
+  // A partially exposed card settles back to its full position before the zoom.
+  note.scrollTop=0;
+  openAsk(true,{...captureReadingPosition(),reading:true});
+},true);
+answer.addEventListener('keydown',event=>{
+  if(isPagedNote||!['Enter',' '].includes(event.key))return;
+  event.preventDefault();note.scrollTop=0;openAsk(true,{...captureReadingPosition(),reading:true});
+});
+
+// Full Dots conversation is a separate reading page: scrolling never reveals the note.
+readerScroll.addEventListener('pointerdown',event=>{
+  if(!verticalReaderOpen()||event.pointerType!=='mouse'||event.button!==0||interactiveReadingTarget(event.target))return;
+  event.preventDefault();
+  readerGesture={id:event.pointerId,y:event.clientY,top:readerScroll.scrollTop,moved:false};
+});
+readerScroll.addEventListener('pointermove',event=>{
+  const g=readerGesture;if(!g||g.id!==event.pointerId)return;
+  const delta=(g.y-event.clientY)/verticalScale();
+  if(!g.moved){if(Math.abs(delta)<7)return;g.moved=true;readerScroll.setPointerCapture(event.pointerId)}
+  event.preventDefault();readerScroll.scrollTop=g.top+delta;
+});
+function finishReaderGesture(event){
+  if(!readerGesture||readerGesture.id!==event.pointerId)return;
+  readerGesture=null;
+  if(readerScroll.hasPointerCapture(event.pointerId))readerScroll.releasePointerCapture(event.pointerId);
+}
+readerScroll.addEventListener('pointerup',finishReaderGesture);
+readerScroll.addEventListener('pointercancel',finishReaderGesture);
 </script><script>// Keep the existing detail surfaces mounted so back navigation preserves reading positions.
 const feedPage=$('#feedPage'),feedScroll=$('#feedScroll'),feedTarget=$('#feedTarget');
 const detailSurfaces=[...$('.phone').children].filter(el=>el!==feedPage);

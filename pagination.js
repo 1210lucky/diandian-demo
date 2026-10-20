@@ -2,6 +2,7 @@
 // Text flows across pages; images and other non-text components remain intact.
 const pageTrack=$('#answerPages'),pageDots=$('#answerPageDots'),pageCount=$('#answerPageCount');
 let isPagedNote=false,answerPageIndex=0,pageBuildSize='';
+let pagedModeAnchor=null,pagedModeStartIndex=0;
 const noteCopy=$('.note-body>p'),originalNoteCopy=noteCopy.textContent;
 const commentCopy=$('#comments .comment p'),originalCommentCopy=commentCopy.textContent;
 function pageClone(source){
@@ -9,6 +10,12 @@ function pageClone(source){
   clone.removeAttribute('id');
   clone.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
   return clone;
+}
+function textFragment(element,from,to){
+  const walker=document.createTreeWalker(element,NodeFilter.SHOW_TEXT),nodes=[];let n,offset=0;
+  while(n=walker.nextNode()){nodes.push({n,start:offset,end:offset+n.length});offset+=n.length}
+  const a=nodes.find(x=>x.end>from),b=nodes.find(x=>x.end>=to),range=document.createRange();
+  range.setStart(a.n,from-a.start);range.setEnd(b.n,to-b.start);return range.cloneContents();
 }
 function selectAnswerPage(index,animate=true){
   answerPageIndex=Math.max(0,Math.min(pageTrack.children.length-1,index));
@@ -30,17 +37,32 @@ function refreshAnswerPage(){
   [...pageTrack.children].forEach((page,i)=>page.inert=i!==answerPageIndex);
   if(isPagedNote&&$('.phone').dataset.view!=='feed')$('#guideState').textContent='左右翻页 · '+(answerPageIndex+1)+' / '+total;
 }
-function buildAnswerPages(){
+function capturePagedPosition(){
+  const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
+  return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
+}
+function pageAtPosition(position){
+  return [...pageTrack.children].findIndex(slide=>[...slide.querySelectorAll('[data-reading-anchor]')].some(block=>{
+    if(block.dataset.readingAnchor!==position.anchor)return false;
+    const start=Number(block.dataset.textStart||0);
+    return position.textIndex>=start&&position.textIndex<start+Math.max(1,block.textContent.length);
+  }));
+}
+function buildAnswerPages(position){
   const width=pageTrack.clientWidth,height=pageTrack.clientHeight;
   if(!width||!height)return;
-  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length)return;
+  const size=width+':'+height;if(pageBuildSize===size&&pageTrack.children.length&&!position)return;
   pageBuildSize=size;const previous=answerPageIndex;pageTrack.replaceChildren();pageDots.replaceChildren();
   let page,body,response;
   const newPage=()=>{
     page=document.createElement('section');page.className='answer-page';
     body=document.createElement('div');body.className='answer-page-body';page.append(body);pageTrack.append(page);response=null;
   };
-  const fits=()=>body.scrollHeight<=body.clientHeight+1;
+  // Measure rendered boxes, including padding, so desktop CSS zoom cannot shift the cut.
+  const fits=()=>{
+    const limit=body.getBoundingClientRect().bottom;
+    return [...body.children].every(child=>child.getBoundingClientRect().bottom<=limit+.25);
+  };
   const responseShell=()=>{
     response=document.createElement('div');response.className='dots-response page-response dots-markdown';body.append(response);return response;
   };
@@ -58,18 +80,41 @@ function buildAnswerPages(){
       copy.classList.add('text-continues');start=low;newPage();copy=pageClone(original);copy.classList.add('text-continuation');body.append(copy);
     }
   }
-  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')];
+  // On a size/mode change keep the visible passage at a page boundary. Reflow the
+  // surrounding content without sending the reader back to the start of a paragraph.
+  const originals=[...answer.querySelectorAll('.response-status,.dots-markdown h4,.dots-markdown p,.dots-media-image')].flatMap(element=>{
+    if(!pagedClean||element.dataset.readingAnchor!==position?.anchor)return [element];
+    const at=position.textIndex||0,copy=pageClone(element);
+    if(at>0&&at<element.textContent.length&&element.matches('p')){
+      const before=pageClone(element);
+      before.replaceChildren(textFragment(element,0,at));
+      copy.replaceChildren(textFragment(element,at,element.textContent.length));
+      copy.dataset.textStart=String(at);copy.dataset.pageBreak='true';
+      return [before,copy];
+    }
+    copy.dataset.pageBreak='true';return [copy];
+  });
   // Keep a title/status with the beginning of its paragraph, not the entire paragraph.
   const groups=[];
   for(let i=0;i<originals.length;i++){
     const group=[originals[i]];
-    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p'))group.push(originals[++i]);
+    if((originals[i].matches('h4')||originals[i].classList.contains('response-status'))&&originals[i+1]?.matches('p')&&!originals[i+1].dataset.pageBreak)group.push(originals[++i]);
     groups.push(group);
   }
   for(const group of groups){
+    if(group[0].dataset.pageBreak&&body.children.length)newPage();
     if(!response)responseShell();
     const wrapper=document.createElement('div');wrapper.className='page-block';group.forEach(el=>wrapper.append(pageClone(el)));response.append(wrapper);
     if(fits())continue;
+    // Keep the image group intact. If it only just misses the cut, fit three square
+    // thumbnails into the remaining space rather than leaving a large empty tail.
+    const images=wrapper.querySelector('.dots-media-image');
+    if(images){
+      const scale=page.getBoundingClientRect().width/page.offsetWidth||1;
+      const overflow=(response.getBoundingClientRect().bottom-body.getBoundingClientRect().bottom)/scale;
+      const tile=(images.clientWidth-12)/3-overflow-1;
+      if(tile>=72){images.style.width=(tile*3+12)+'px';images.style.marginInline='auto';if(fits())continue;images.style.width='';images.style.marginInline=''}
+    }
     if(wrapper.querySelector('p'))flowParagraph(wrapper);
     else moveBlock(wrapper);
   }
@@ -80,21 +125,16 @@ function buildAnswerPages(){
   }
   function flowParagraph(wrapper){
     let paragraph=wrapper.querySelector('p');if(!paragraph)return;
-    const original=paragraph.cloneNode(true);let start=0;
+    const original=paragraph.cloneNode(true),base=Number(paragraph.dataset.textStart||0);let start=0;
     const textLength=original.textContent.length;
-    function fragment(from,to){
-      const walker=document.createTreeWalker(original,NodeFilter.SHOW_TEXT),nodes=[];let n,offset=0;
-      while(n=walker.nextNode()){nodes.push({n,start:offset,end:offset+n.length});offset+=n.length}
-      const a=nodes.find(x=>x.end>from),b=nodes.find(x=>x.end>=to);const range=document.createRange();
-      range.setStart(a.n,from-a.start);range.setEnd(b.n,to-b.start);return range.cloneContents();
-    }
+    const fragment=(from,to)=>textFragment(original,from,to);
     while(start<textLength){
       let low=start,high=textLength;
       while(low<high){const mid=Math.ceil((low+high)/2);paragraph.replaceChildren(fragment(start,mid));if(fits())low=mid;else high=mid-1}
       // If even one complete line cannot fit, carry its heading/status to the next page.
       if(low===start){paragraph.replaceChildren(fragment(start,textLength));moveBlock(wrapper);continue}
       const end=low;
-      paragraph.replaceChildren(fragment(start,end));paragraph.dataset.textStart=String(start);
+      paragraph.replaceChildren(fragment(start,end));paragraph.dataset.textStart=String(base+start);
       if(end===textLength)break;
       response.classList.add('continues');newPage();responseShell();response.classList.add('continuation');
       wrapper=document.createElement('div');wrapper.className='page-block';response.append(wrapper);
@@ -115,7 +155,8 @@ function buildAnswerPages(){
       dot.addEventListener('click',()=>selectAnswerPage(Number(dot.dataset.page)));pageDots.append(dot);
     }
   });
-  selectAnswerPage(previous,false);
+  const located=position?pageAtPosition(position):-1;
+  selectAnswerPage(located<0?previous:located,false);
 }
 function setNotePagination(enabled){
   resetPagedReader();
@@ -126,10 +167,7 @@ function setNotePagination(enabled){
   noteCopy.textContent=enabled?'和朋友的暑假伊犁环线计划，点点帮我们整理好了，左右滑动上面的卡片查看完整攻略。':originalNoteCopy;
   commentCopy.textContent=enabled?'左右翻页看攻略，好方便！':originalCommentCopy;
   note.scrollTop=0;
-  window.pagedReadingPosition=enabled?()=>{
-    const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
-    return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
-  }:null;
+  window.pagedReadingPosition=enabled?capturePagedPosition:null;
   if(enabled)buildAnswerPages();
 }
 pageTrack.addEventListener('scroll',()=>{

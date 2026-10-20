@@ -18,11 +18,6 @@ function updateProgress(){if($('.phone').dataset.view==='feed'){$('#guideState')
 answer.addEventListener('scroll',updateProgress,{passive:true});new ResizeObserver(updateProgress).observe(answer);
 function jumpTo(el){const scale=answer.getBoundingClientRect().height/answer.offsetHeight;answer.scrollTo({top:answer.scrollTop+(el.getBoundingClientRect().top-answer.getBoundingClientRect().top)/scale,behavior:smooth})}
 document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpTo(document.getElementById(b.dataset.jump))));
-let drag=null;
-answer.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,a,input'))return;drag={y:e.clientY,top:answer.scrollTop,moved:false,id:e.pointerId}});
-answer.addEventListener('pointermove',e=>{if(!drag)return;const delta=drag.y-e.clientY;if(Math.abs(delta)>4){drag.moved=true;answer.setPointerCapture(e.pointerId);answer.classList.add('dragging');answer.scrollTop=drag.top+delta/(answer.getBoundingClientRect().height/answer.offsetHeight)}});
-function endDrag(){drag=null;answer.classList.remove('dragging')}
-answer.addEventListener('pointerup',endDrag);answer.addEventListener('pointercancel',endDrag);window.addEventListener('pointerup',endDrag);
 $('#reset').addEventListener('click',()=>resetExperience());
 $('#back').addEventListener('click',()=>returnToFeed());
 $('#follow').addEventListener('click',e=>{const on=e.currentTarget.classList.toggle('followed');e.currentTarget.textContent=on?'已关注':'关注';toast(on?'已关注（演示）':'已取消关注（演示）')});
@@ -94,6 +89,7 @@ function setConversationMode(full,position='bottom'){
   askSheet.classList.remove('recommendation-mode','query-mode');$('#recommendedQueries').hidden=true;$('#followupMessages').replaceChildren();
   const reading=full&&typeof position==='object'&&position.reading===true;
   conversationMode=full;askSheet.classList.toggle('conversation-mode',full);askSheet.classList.toggle('reading-mode',reading);askSheet.classList.remove('keyboard-open');
+  askSheet.classList.toggle('vertical-reading',reading&&!window.pagedReadingPosition);
   $('#sharedConversation').hidden=!full&&!reading;$('#newTopic').hidden=!full||position!=='bottom';$('#expandAsk').hidden=full||reading;$('#readerFooter').hidden=!reading;
   $('#closeAsk').setAttribute('aria-label',full?'返回小红书笔记':reading?'关闭完整对话':'关闭问点点');
   const closeIcon=$('#closeAsk img'),titleIcon=$('#sheetTitle img');
@@ -148,8 +144,7 @@ function closeAsk(){
   questionInput.blur();
   const finish=()=>{
     if(token!==conversationEntryToken)return;
-    askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
-    inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
+    finishAskClose();
   };
   if(conversationMode){
     const source=conversationSource();
@@ -157,6 +152,10 @@ function closeAsk(){
     askOverlay.style.visibility='hidden';
     conversationEntryAnimation=demoMotion.transition({fromRect,toRect:source.rect,fromSnapshot,toSnapshot:source.snapshot,onFinish:finish});
   }else{askOverlay.classList.remove('is-open');closeTimer=setTimeout(finish,smooth==='auto'?0:240)}
+}
+function finishAskClose(){
+  askOverlay.hidden=true;askOverlay.style.visibility='';askOverlay.classList.remove('is-open');setConversationMode(false);
+  inertElements.forEach(el=>el.inert=false);inertElements=[];previousFocus?.focus({preventScroll:true});
 }
 $('#viewConversation').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true}));
 let readerReturnScroll=0;
