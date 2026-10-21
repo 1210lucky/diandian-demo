@@ -5,7 +5,7 @@ let verticalGesture=null,readerGesture=null,verticalClickUntil=0;
 const verticalScale=()=>verticalPhone.getBoundingClientRect().width/verticalPhone.offsetWidth||1;
 const scrollLimit=el=>Math.max(0,el.scrollHeight-el.clientHeight);
 const interactiveReadingTarget=target=>target.closest('button:not(:disabled),a,input,textarea');
-const verticalReaderOpen=()=>!askOverlay.hidden&&askSheet.matches('.vertical-reading.reading-mode');
+const conversationReaderOpen=()=>!askOverlay.hidden&&askSheet.matches('.reading-mode');
 
 function consumeVerticalScroll(delta,inCard){
   if(inCard&&note.scrollTop<=.5){
@@ -66,7 +66,7 @@ answer.addEventListener('keydown',event=>{
 
 // Full Dots conversation is a separate reading page: scrolling never reveals the note.
 readerScroll.addEventListener('pointerdown',event=>{
-  if(!verticalReaderOpen()||event.pointerType!=='mouse'||event.button!==0||interactiveReadingTarget(event.target))return;
+  if(!conversationReaderOpen()||event.pointerType!=='mouse'||event.button!==0||interactiveReadingTarget(event.target))return;
   event.preventDefault();
   readerGesture={id:event.pointerId,y:event.clientY,top:readerScroll.scrollTop,moved:false};
 });

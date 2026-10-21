@@ -24,7 +24,6 @@ function selectAnswerPage(index,animate=true){
 function refreshAnswerPage(){
   const total=pageTrack.children.length;
   pageCount.textContent=(answerPageIndex+1)+'/'+total;
-  $('#cleanPageCount').textContent=(answerPageIndex+1)+' / '+total;
   const start=Math.max(0,Math.min(answerPageIndex-2,total-5));
   [...pageDots.children].forEach((button,slot)=>{
     const index=start+slot;
@@ -37,8 +36,16 @@ function refreshAnswerPage(){
   if(isPagedNote&&$('.phone').dataset.view!=='feed')$('#guideState').textContent='左右翻页 · '+(answerPageIndex+1)+' / '+total;
 }
 function capturePagedPosition(){
-  const block=pageTrack.children[answerPageIndex]?.querySelector('[data-reading-anchor]');
-  return {anchor:block?.dataset.readingAnchor||'0',textIndex:Number(block?.dataset.textStart||0),lineOffset:0,offset:0,ratio:0};
+  const blocks=[...pageTrack.children[answerPageIndex].querySelectorAll('[data-reading-anchor]')];
+  const viewport=pageTrack.getBoundingClientRect(),noteViewport=note.getBoundingClientRect();
+  const scale=viewport.width/pageTrack.offsetWidth||1;
+  const clippedTop=Math.max(viewport.top,noteViewport.top);
+  const top=clippedTop<Math.min(viewport.bottom,noteViewport.bottom)?clippedTop:viewport.top;
+  const block=blocks.find(el=>el.getBoundingClientRect().bottom>top+1)||blocks.at(-1);
+  const rect=block.getBoundingClientRect(),text=block.matches('p,h4')?textPointAtTop(block,top):null;
+  return {anchor:block.dataset.readingAnchor,textIndex:text?Number(block.dataset.textStart||0)+text.index:undefined,
+    lineOffset:text?(top-text.top)/scale:0,offset:(top-rect.top)/scale,
+    ratio:Math.max(0,Math.min(1,(top-rect.top)/rect.height))};
 }
 function buildAnswerPages(){
   const width=pageTrack.clientWidth,height=pageTrack.clientHeight;
@@ -139,7 +146,6 @@ function setNotePagination(enabled){
   resetPagedReader();
   isPagedNote=enabled;$('.ai-card').classList.toggle('paged-note',enabled);
   $('.phone').classList.toggle('paged-mode',enabled);
-  if(enabled){measurePagedReader();setPagedCleanState(false)}
   answer.hidden=enabled;pageTrack.hidden=!enabled;pageDots.hidden=!enabled;pageCount.hidden=!enabled;
   noteCopy.textContent=enabled?'和朋友的暑假伊犁环线计划，点点帮我们整理好了，左右滑动上面的卡片查看完整攻略。':originalNoteCopy;
   commentCopy.textContent=enabled?'左右翻页看攻略，好方便！':originalCommentCopy;
@@ -153,6 +159,6 @@ pageTrack.addEventListener('scroll',()=>{
 },{passive:true});
 pageTrack.addEventListener('keydown',e=>{
   if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}
-  else if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePagedReader()}
+  else if(e.key==='Enter'||e.key===' '){e.preventDefault();openPagedConversation()}
 });
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);

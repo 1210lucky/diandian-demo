@@ -136,26 +136,15 @@
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
-/* Hide the chrome without changing page size, text cuts, or image geometry. */
-.clean-page-count{display:none}
-.phone.paged-mode{--clean-progress:0;background:var(--dots-bg-0)}
-.paged-mode>.note-header{position:absolute;left:0;right:0;top:0;transform:translateY(calc(-100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
-.paged-mode>.engage-bar{position:absolute;left:0;right:0;bottom:0;transform:translateY(calc(100% * var(--clean-progress)));opacity:calc(1 - var(--clean-progress))}
-.paged-mode>.note-scroll{position:absolute;left:0;right:0;top:calc(var(--paged-header) * (1 - var(--clean-progress)));bottom:calc(var(--paged-bottom) * (1 - var(--clean-progress)));background:#fff;touch-action:pinch-zoom;overflow-anchor:none}
-.paged-mode .media-area{height:calc(var(--paged-base-height) + var(--paged-growth) * var(--clean-progress));min-height:0;max-height:none}
-.paged-mode .ai-card{overflow:hidden}
-.paged-mode .answer-pages{flex:none;height:var(--paged-page-height);transform:translateY(calc(var(--paged-center) * var(--clean-progress)));touch-action:pinch-zoom}
-.paged-mode .ai-footer{opacity:calc(1 - var(--clean-progress))}
-.paged-clean .ai-footer{visibility:hidden}
-.paged-mode .answer-page-count,.paged-mode .answer-page-dots{opacity:calc(1 - var(--clean-progress))}
-.paged-mode .clean-page-count{display:block;position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:12px;line-height:20px;color:var(--dots-description);opacity:var(--clean-progress);pointer-events:none}
-.paged-clean>.note-header,.paged-clean>.engage-bar,.paged-clean .ai-footer,.paged-clean .answer-page-dots{pointer-events:none}
+/* Use the original note-card dimensions; only the conversation opens full screen. */
+.paged-mode>.note-scroll{touch-action:pinch-zoom;overflow-anchor:none}
+.paged-mode .answer-pages{touch-action:pinch-zoom}
 .paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .phone>.note-scroll img{-webkit-user-drag:none}
 /* Vertical notes keep their original card size; full-reader taps never toggle it closed. */
 .phone:not(.paged-mode)>.note-scroll,.phone:not(.paged-mode) .answer-scroll{touch-action:pinch-zoom}
-.vertical-reading.reading-mode .sheet-space{touch-action:pan-y}
-.vertical-reading.reading-mode .sheet-space img{-webkit-user-drag:none}
+.reading-mode .sheet-space{touch-action:pan-y}
+.reading-mode .sheet-space img{-webkit-user-drag:none}
 .scheme-annotations{position:fixed;inset:0;pointer-events:none;z-index:40;color:#1768e8}
 .scheme-annotations[hidden],.scheme-annotation[hidden]{display:none}
 .scheme-annotation>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
