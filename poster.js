@@ -1,6 +1,6 @@
 // Scheme 3: the feed cover opens a full-height static conversation preview, then the Dots reader.
 (() => {
-  const phone=$('.phone'),coverTemplate=$('#posterCoverTemplate'),coverMessages=$('#posterMessagesTemplate');
+  const phone=$('.phone'),coverTemplate=$('#posterCoverTemplate');
   const threadTemplate=$('#suzhouConversationTemplate'),detail=$('#posterDetailPreview');
   const shared=$('#sharedMessages'),originalMessages=[...shared.childNodes];
   const queryButtons=[...$('#recommendedQueries').querySelectorAll('button')];
@@ -9,34 +9,29 @@
   const noteText=[[$('.note-body h2'),'苏州三日游旅行攻略'],[$('.note-body>p'),'点点帮我整理了苏州三天两晚的旅行攻略，路线、景点、美食和住宿都在上面的对话里。'],[$('.note-body .hashtags'),'#有问题问点点 #点点AI #苏州旅游'],[$('#comments .comment p'),'这份苏州行程很实用！'],[$('#comments .comment:nth-of-type(2) p'),'准备收藏，去苏州时用']].map(([element,text])=>({element,text,original:element.textContent}));
   let active=false,gesture=null;
 
-  // All three covers share the scheme 3 layout; their excerpts come from each note.
+  // The cover crops a proportionally scaled reader, including its real bubble geometry.
   const coverCopy={
-    xinjiang:{title:['新疆十日游','旅行攻略'],tags:['每日路线','必玩景点','包车建议','预算参考']},
-    yili:{title:['伊犁大环线','行程规划'],tags:['环线规划','沿途景点','出行建议','实用提醒']}
+    xinjiang:['新疆十日游','旅行攻略'],
+    yili:['伊犁大环线','行程规划']
   };
+  const xinjiangTags=['每日路线','必玩景点','包车建议','预算参考'];
   document.querySelectorAll('[data-poster-cover]').forEach(frame=>{
     frame.append(coverTemplate.content.cloneNode(true));
-    const variant=frame.dataset.posterCover,copy=coverCopy[variant],preview=frame.querySelector('.suzhou-preview');
-    if(!copy){preview.append(coverMessages.content.cloneNode(true));return}
-    frame.querySelector('.suzhou-title').replaceChildren(copy.title[0],document.createElement('br'),copy.title[1]);
-    const subtitle=frame.querySelector('.suzhou-subtitle'),divider=subtitle.querySelector('img').cloneNode(true);
-    subtitle.replaceChildren();
-    copy.tags.forEach((text,index)=>{if(index)subtitle.append(divider.cloneNode(true));const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
-    if(variant==='xinjiang'){
-      const question=answer.querySelector('.user-message').cloneNode(true);
-      const intro=document.createElement('div');intro.className='dots-response dots-markdown';
-      intro.append(answer.querySelector('.dots-intro p').cloneNode(true));
-      preview.append(question,intro);
+    const title=coverCopy[frame.dataset.posterCover],screen=frame.querySelector('.cover-dialogue');
+    const preview=frame.querySelector('.cover-dialogue-messages');
+    if(title){
+      frame.querySelector('.suzhou-title').replaceChildren(title[0],document.createElement('br'),title[1]);
+      const subtitle=frame.querySelector('.suzhou-subtitle'),divider=subtitle.querySelector('img').cloneNode(true);
+      subtitle.replaceChildren();
+      xinjiangTags.forEach((text,index)=>{if(index)subtitle.append(divider.cloneNode(true));const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
+      preview.append(...originalMessages.map(message=>message.cloneNode(true)));
     }else{
-      const response=document.createElement('div');response.className='dots-response';
-      const status=answer.querySelector('.response-status').cloneNode(true);
-      const markdown=document.createElement('div');markdown.className='dots-markdown';
-      const photos=document.createElement('div');photos.className='dots-media-image';
-      answer.querySelectorAll('.dots-media-image img').forEach(image=>{const tile=document.createElement('span');tile.className='source-thumbnail';tile.append(image.cloneNode(true));photos.append(tile)});
-      markdown.append(answer.querySelector('.dots-markdown>p').cloneNode(true),photos);
-      response.append(status,markdown);preview.append(response);
+      screen.classList.add('cover-dialogue-suzhou');
+      preview.append(threadTemplate.content.cloneNode(true));
     }
-    preview.querySelectorAll('[id],[data-reading-anchor],[data-reading-title]').forEach(el=>{el.removeAttribute('id');el.removeAttribute('data-reading-anchor');el.removeAttribute('data-reading-title')});
+    // This is a static screenshot inside the clickable feed card, not nested controls.
+    preview.querySelectorAll('button').forEach(button=>{const imageFrame=document.createElement('span');imageFrame.className=button.className;imageFrame.append(...button.childNodes);button.replaceWith(imageFrame)});
+    preview.querySelectorAll('[id],[tabindex],[data-reading-anchor],[data-reading-title]').forEach(el=>{el.removeAttribute('id');el.removeAttribute('tabindex');el.removeAttribute('data-reading-anchor');el.removeAttribute('data-reading-title')});
   });
   const observer=new ResizeObserver(entries=>entries.forEach(({target:frame})=>{
     if(!frame.clientWidth)return;
