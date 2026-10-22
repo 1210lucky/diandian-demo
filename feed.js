@@ -20,7 +20,7 @@ function setFeedVisible(show,animate=true){
   feedPage.inert=animate||!show;
   detailSurfaces.forEach(el=>el.inert=animate||show);
   $('.demo-jumps').hidden=show||isPagedNote||posterExperience.active;
-  $('#guideIntro').innerHTML=show?'方案1上下滑动，方案2左右翻页。<br>右列苏州封面是新增的方案3。':posterExperience.active?'整屏阅读苏州图文对话，<br>上下操作栏保持显示。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
+  $('#guideIntro').innerHTML=show?'方案1上下滑动，方案2左右翻页。<br>右列苏州封面是新增的方案3。':posterExperience.active?'首屏预览苏州图文对话，<br>上滑查看笔记正文和评论。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
   updateProgress();
   const finish=()=>{if(token!==feedTransitionToken)return;feedPage.hidden=!show;feedPage.inert=!show;detailSurfaces.forEach(el=>el.inert=show);if(animate)(show?activeFeedCard:$('#back')).focus({preventScroll:true})};
   if(animate){

@@ -23,12 +23,10 @@
 
 /* Full-height note: keep the author's header and the normal engagement toolbar. */
 .poster-note[hidden]{display:none}
-.poster-note{height:100%;display:flex;flex-direction:column;position:relative;background:#f5f5f5;color:rgba(0,0,0,.8)}
-.poster-detail-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:none;touch-action:pan-y;overscroll-behavior-y:auto;cursor:grab;overflow-anchor:none}
-.poster-detail-scroll::-webkit-scrollbar{display:none}
-.poster-detail-scroll img{-webkit-user-drag:none;user-select:none}
-.poster-footer{height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#f5f5f5}
-.poster-footer button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 16px;border-radius:99px;background:rgba(255,255,255,.94);border:.5px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.06);color:rgba(0,0,0,.62);font-size:12px;font-weight:500;line-height:20px}
+/* A clipped first frame, not a second scroll surface. Gestures belong to the note. */
+.poster-note{height:100%;position:relative;overflow:clip;background:#f5f5f5;color:rgba(0,0,0,.8)}
+.poster-detail-preview{height:100%;overflow:clip;pointer-events:none;user-select:none;-webkit-user-select:none}
+.poster-footer{position:absolute;left:0;right:0;bottom:0;height:72px;padding:20px 16px 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(to bottom,rgba(245,245,245,0),#f5f5f5);pointer-events:none}
 .poster-mode>.note-scroll{min-height:0;touch-action:pan-y;overflow-anchor:none}
 .poster-mode>.note-scroll>.media-area{display:none}
 

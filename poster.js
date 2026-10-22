@@ -1,7 +1,7 @@
-// Scheme 3: the feed cover opens a full-height note conversation, then the Dots reader.
+// Scheme 3: the feed cover opens a full-height static conversation preview, then the Dots reader.
 (() => {
   const phone=$('.phone'),coverTemplate=$('#posterCoverTemplate'),coverMessages=$('#posterMessagesTemplate');
-  const threadTemplate=$('#suzhouConversationTemplate'),detail=$('#posterDetailScroll');
+  const threadTemplate=$('#suzhouConversationTemplate'),detail=$('#posterDetailPreview');
   const shared=$('#sharedMessages'),originalMessages=[...shared.childNodes];
   const queryButtons=[...$('#recommendedQueries').querySelectorAll('button')];
   const originalQueries=queryButtons.map(button=>button.dataset.query);
@@ -19,9 +19,10 @@
   }));
   document.querySelectorAll('[data-poster-cover]').forEach(frame=>observer.observe(frame));
 
-  // Both reading surfaces use the exact same structure, widths, assets and anchors.
+  // The clipped preview and full reader share content and reading anchors.
   [...threadTemplate.content.querySelectorAll('p,h4,h5,[data-su-block],.su-actions')].forEach((el,index)=>el.dataset.readingAnchor='suzhou-'+index);
   detail.append(threadTemplate.content.cloneNode(true));
+  detail.firstElementChild.setAttribute('aria-hidden','true');
   function setActive(enabled){
     if(active===enabled)return;
     active=enabled;gesture=null;phone.classList.toggle('poster-mode',enabled);$('#posterNote').hidden=!enabled;
@@ -32,7 +33,6 @@
       button.dataset.query=text;button.firstElementChild.textContent=text;
     });
     $('#conversationScroll').scrollTop=0;
-    if(enabled)detail.scrollTop=0;
   }
   function capturePosition(){
     const viewport=detail.getBoundingClientRect(),outer=note.getBoundingClientRect();
@@ -50,19 +50,17 @@
   }
   $('#posterViewConversation').addEventListener('click',()=>openAsk(true,{...capturePosition(),reading:true}));
 
-  // Native touch scrolling stays within the dialogue, then hands off to the note.
-  // Mouse dragging follows the same sequence without touching scheme 1's handlers.
+  // Touch and wheel use the outer note's native scroll. Mouse dragging does the same.
   note.addEventListener('pointerdown',event=>{
     if(!active||!askOverlay.hidden||event.pointerType!=='mouse'||event.button!==0||event.target.closest('button,a,input'))return;
-    gesture={id:event.pointerId,y:event.clientY,card:!!event.target.closest('#posterNote'),moved:false};
+    gesture={id:event.pointerId,y:event.clientY,moved:false};
   });
   note.addEventListener('pointermove',event=>{
     if(!gesture||gesture.id!==event.pointerId)return;
     const scale=phone.getBoundingClientRect().width/phone.offsetWidth||1;
-    let delta=(gesture.y-event.clientY)/scale;
+    const delta=(gesture.y-event.clientY)/scale;
     if(!gesture.moved){if(Math.abs(delta)<7)return;gesture.moved=true;note.setPointerCapture(event.pointerId)}
     event.preventDefault();gesture.y=event.clientY;
-    if(gesture.card&&note.scrollTop<=.5){const old=detail.scrollTop;detail.scrollTop+=delta;delta-=detail.scrollTop-old}
     note.scrollTop+=delta;
   },{passive:false});
   function endGesture(event){

@@ -45,8 +45,8 @@
   <header class="note-header"><div class="system-bar"><img src="assets/time.svg" alt="9:41" width="54" height="20"><img src="assets/status.svg" alt="手机状态" width="67" height="12"></div><div class="nav-bar"><button class="icon-button" id="back" aria-label="返回双列笔记流"><img src="assets/back.svg" alt="" width="26" height="26"></button><img class="avatar" src="assets/avatar.png" alt="作者头像" width="36" height="36"><span class="author">Purple阿紫</span><button class="follow" id="follow">关注</button><button class="icon-button" id="share" aria-label="分享原型链接"><img src="assets/share.svg" alt="" width="26" height="26"></button></div></header>
   <div class="note-scroll" id="noteScroll">
     <section id="posterNote" class="poster-note" aria-label="苏州三日游全屏对话笔记" hidden>
-      <div id="posterDetailScroll" class="poster-detail-scroll" tabindex="0" role="region" aria-label="上下滑动阅读苏州三日游攻略"></div>
-      <footer class="poster-footer"><button type="button" id="posterViewConversation"><img src="assets/reader-ask-logo.svg" alt="" width="16.7993" height="16.7997"><span>查看完整对话</span></button></footer>
+      <div id="posterDetailPreview" class="poster-detail-preview" role="img" aria-label="苏州三日游对话首屏预览，查看完整对话可继续阅读"></div>
+      <footer class="poster-footer"><button type="button" id="posterViewConversation" class="dialogue-cta"><span class="dialogue-cta-logo"><img src="assets/conversation-entry-logo.svg" alt=""></span><span>查看完整对话</span></button></footer>
     </section>
     <div class="media-area">
       <article class="ai-card" aria-label="点点 AI 分享的新疆旅行对话">
@@ -76,7 +76,7 @@
           </div>
         </div>
         <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话，轻点进入点点对话页"></div><span id="answerPageCount" class="answer-page-count" hidden></span>
-        <footer class="ai-footer"><button type="button" class="view-conversation" id="viewConversation">查看完整对话</button><nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav></footer>
+        <footer class="ai-footer"><button type="button" class="view-conversation dialogue-cta" id="viewConversation"><span class="dialogue-cta-logo"><img src="assets/conversation-entry-logo.svg" alt=""></span><span>查看完整对话</span></button><nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav></footer>
       </article>
     </div>
     <section class="note-body"><h2>新疆旅游攻略</h2><p>和朋友的暑假伊犁环线计划，点点帮我们整理好了，直接在上面的卡片里上下滑动看完整攻略。</p><p class="hashtags">#有问题问点点 #点点AI #新疆旅游</p><p class="timestamp">编辑于 今天  ·  上海</p></section>
@@ -97,7 +97,7 @@
         <div id="followupMessages" aria-live="polite"></div>
         <p id="askFeedback" role="status"></p>
       </div>
-      <footer id="readerFooter" class="reader-footer" hidden><button type="button" id="askAlso" class="ask-also"><span class="ask-also-logo"><img src="assets/reader-ask-logo.svg" alt="" width="16.7993" height="16.7997"></span><span>问点点</span></button><div class="reader-home" aria-hidden="true"></div></footer>
+      <footer id="readerFooter" class="reader-footer" hidden><button type="button" id="askAlso" class="ask-also dialogue-cta"><span class="dialogue-cta-logo"><img src="assets/conversation-entry-logo.svg" alt=""></span><span>我也问点点</span></button><div class="reader-home" aria-hidden="true"></div></footer>
       <nav id="askSuggestions" class="sheet-suggestions" aria-label="关于这份伊犁环线的推荐追问"></nav>
       <button type="button" id="recommendationDismiss" class="recommendation-dismiss" aria-label="收起推荐问题，返回完整对话" hidden></button>
       <nav id="recommendedQueries" class="recommended-queries" aria-label="推荐问题" hidden><button type="button" data-query="还有什么小众玩法？"><span>还有什么小众玩法？</span><span class="query-arrow"><img src="assets/reader-query-arrow.svg" alt=""></span></button><button type="button" data-query="帮我推荐其他自驾路线"><span>帮我推荐其他自驾路线</span><span class="query-arrow"><img src="assets/reader-query-arrow.svg" alt=""></span></button><button type="button" data-query="大家怎么评价赛里木湖"><span>大家怎么评价赛里木湖</span><span class="query-arrow"><img src="assets/reader-query-arrow.svg" alt=""></span></button></nav>
@@ -117,7 +117,7 @@
   </section>
   <dialog id="commentDialog"><form method="dialog" class="dialog-heading"><b>写评论</b><button aria-label="关闭评论">×</button></form><p class="demo-notice">评论仅显示在本次演示中</p><form id="commentForm" class="input-form"><label class="sr-only" for="commentInput">评论内容</label><input id="commentInput" placeholder="说点什么…" maxlength="200" required><button type="submit">发布</button></form></dialog>
 </section>
-<aside class="demo-guide"><span class="guide-kicker">INTERACTIVE NOTE / 05</span><h2>从一篇笔记，<br>走进点点对话。</h2><p class="guide-intro" id="guideIntro">点击左列「新疆旅游攻略」，<br>进入可上下滑动的点点互动笔记。</p><div class="guide-items"><div><span>01</span><p><b>从双列流进入</b>点击对应封面，打开互动笔记。</p></div><div><span>02</span><p><b>完整图文内容</b>阅读分享的行程、攻略和对话内容。</p></div><div><span>03</span><p><b>随时继续追问</b>查看完整对话，再点「问点点」继续聊。</p></div></div><nav class="demo-jumps" aria-label="演示跳转"><button data-jump="responseStart">回答开头</button><button data-jump="itinerary">行程安排</button><button data-jump="tips">实用提醒</button></nav><div class="live-state"><span class="live-dot"></span><span id="guideState">等待开始阅读</span></div><p class="guide-footnote">Figma 原稿内容 · Dots 组件规范<br>仅为交互原型，旅行内容未作实时核验</p></aside>
+<aside class="demo-guide"><span class="guide-kicker">INTERACTIVE NOTE / 05</span><h2>从一篇笔记，<br>走进点点对话。</h2><p class="guide-intro" id="guideIntro">点击左列「新疆旅游攻略」，<br>进入可上下滑动的点点互动笔记。</p><div class="guide-items"><div><span>01</span><p><b>从双列流进入</b>点击对应封面，打开互动笔记。</p></div><div><span>02</span><p><b>完整图文内容</b>阅读分享的行程、攻略和对话内容。</p></div><div><span>03</span><p><b>随时继续追问</b>查看完整对话，再点「我也问点点」继续聊。</p></div></div><nav class="demo-jumps" aria-label="演示跳转"><button data-jump="responseStart">回答开头</button><button data-jump="itinerary">行程安排</button><button data-jump="tips">实用提醒</button></nav><div class="live-state"><span class="live-dot"></span><span id="guideState">等待开始阅读</span></div><p class="guide-footnote">Figma 原稿内容 · Dots 组件规范<br>仅为交互原型，旅行内容未作实时核验</p></aside>
 </main>
 <template id="posterCoverTemplate">
   <div class="suzhou-art" aria-hidden="true">

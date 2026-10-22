@@ -14,7 +14,11 @@
 /* Image group — Figma 1533:2504: square tiles, 6px gaps and vertical padding. */
 .dots-media-image{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px 0}.dots-media-image img{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:16px}
 
-.ai-footer{position:absolute;left:0;right:0;bottom:0;min-height:76px;padding:32px 16px 10px;display:flex;align-items:center;justify-content:flex-end;background:linear-gradient(to bottom,rgba(245,245,245,0) 0%,rgba(245,245,245,.85) 28%,#f5f5f5 44%,#f5f5f5 100%);pointer-events:none;z-index:1}.view-conversation{pointer-events:auto;border:.4px solid var(--dots-separator);border-radius:1000px;padding:4px 12px;background:transparent;box-shadow:none;font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif;font-size:12px;font-weight:400;line-height:18px;letter-spacing:0;color:var(--dots-description)}
+/* Shared entry button — Figma 1687:50966, also used by the video reader CTA. */
+.dialogue-cta{pointer-events:auto;display:flex;flex:none;align-items:center;justify-content:center;gap:4px;height:40px;padding:0 16px 0 14px;border:.5px solid rgba(0,0,0,.08);border-radius:100px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.06);font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;font-weight:500;line-height:20px;letter-spacing:0;color:rgba(0,0,0,.8);white-space:nowrap}
+.dialogue-cta-logo{width:20px;height:20px;display:grid;place-items:center;flex:none}
+.dialogue-cta-logo img{flex:none}
+.ai-footer{position:absolute;left:0;right:0;bottom:0;height:72px;padding:20px 16px 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(to bottom,rgba(245,245,245,0),#f5f5f5);pointer-events:none;z-index:1}
 .card-caption{min-width:0;line-height:15px;font-size:10px;color:#858585;text-align:left}
 .demo-jumps{display:flex;flex-wrap:wrap;gap:6px}.demo-jumps button{padding:6px 9px;border:0.5px solid #d2dcd5;border-radius:8px;font-size:12px;color:#698271;background:transparent}
 .question-context{font-size:14px;line-height:24px;margin-top:18px;padding:12px 14px;border-radius:16px;background:var(--dots-bg-0)}
@@ -73,11 +77,10 @@
 
 /* Complete-dialogue reader — Figma 1550:3190, with the supplied “我也问点点” CTA. */
 .reading-mode .sheet-suggestions,.reading-mode .sheet-composer,.reading-mode .sheet-keyboard,.reading-mode #followupMessages,.reading-mode #askFeedback{display:none}
-/* Figma 1550:51604: right-aligned floating Ask Dots control. */
+/* IMG_0021.MP4: centered floating Ask Dots control above the bottom safe area. */
 .reader-footer{position:absolute;left:0;right:0;bottom:0;height:90px;pointer-events:none;z-index:2}
 .reader-footer[hidden]{display:none}
-.ask-also{position:absolute;right:20px;bottom:32px;pointer-events:auto;display:flex;align-items:center;justify-content:center;gap:6px;width:106px;height:44px;padding:8px 16px 8px 12px;border-radius:99px;background:rgba(255,255,255,.8);box-shadow:0 4px 28px rgba(0,0,0,.16);font-family:"PingFang SC",sans-serif;font-size:16px;font-weight:500;line-height:24px;color:var(--dots-title);letter-spacing:0}
-.ask-also-logo{width:24px;height:24px;display:grid;place-items:center;flex:none}.ask-also-logo img{flex:none}
+.ask-also{position:absolute;left:50%;bottom:28px;transform:translateX(-50%)}
 .reader-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#111}
 .conversation-mode.reading-mode .sheet-space{padding-bottom:96px}
 .recommended-queries[hidden]{display:none}
@@ -95,7 +98,7 @@
 .recommendation-mode .recommended-queries{position:absolute;left:0;right:0;bottom:396px}
 .recommendation-mode .sheet-composer{position:absolute;left:12px;right:12px;bottom:348px;margin:0;z-index:2}
 .recommendation-mode .sheet-keyboard{position:absolute;left:0;right:0;bottom:0;z-index:2}
-@media(max-width:480px){.ask-also{bottom:max(20px,env(safe-area-inset-bottom,0px))}.reader-home{display:none}.recommendation-dismiss{top:0}.recommendation-mode .sheet-space{top:56px}}
+@media(max-width:480px){.ask-also{bottom:max(24px,calc(env(safe-area-inset-bottom,0px) + 8px))}.reader-home{display:none}.recommendation-dismiss{top:0}.recommendation-mode .sheet-space{top:56px}}
 
 /* Sent query — Figma 1550:49144: compact header and content-sized question. */
 .query-more{display:none}
@@ -129,8 +132,10 @@
 .answer-page .text-continues{border-bottom-left-radius:0;border-bottom-right-radius:0}
 .answer-page .text-continuation{border-top-left-radius:0;border-top-right-radius:0}
 .answer-page-count{position:absolute;right:10px;top:10px;background:#0005;color:white;font-size:11px;line-height:18px;border-radius:12px;padding:2px 7px;pointer-events:none}
-.paged-note .ai-footer{position:relative;min-height:56px;height:56px;flex-shrink:0;padding:0 16px;display:grid;grid-template-rows:32px 24px;justify-content:stretch;gap:0;background:var(--dots-bg-0)}
-.paged-note .view-conversation{justify-self:end;align-self:center}
+.paged-note .ai-footer{position:relative;min-height:56px;height:56px;flex-shrink:0;padding:0 16px;display:grid;grid-template-rows:40px 16px;justify-content:stretch;gap:0;background:var(--dots-bg-0)}
+.paged-note .view-conversation{justify-self:center;align-self:center}
+.paged-note .answer-page-dots,.paged-note .answer-page-dots button{height:16px}
+.paged-note .answer-page-dots button:after{top:5.5px}
 .answer-page-dots{height:24px;display:flex;align-items:center;justify-content:center;gap:4px;background:transparent;pointer-events:auto}
 .answer-page-dots button{width:5px;height:24px;padding:0;position:relative}
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
