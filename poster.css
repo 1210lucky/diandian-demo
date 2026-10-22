@@ -1,4 +1,4 @@
-/* Scheme 3 only. Cover geometry comes from Figma 1683:50113 (393 × 524). */
+/* Shared feed cover. Geometry comes from scheme 3, Figma 1683:50113 (393 × 524). */
 .suzhou-cover{position:relative;display:block;overflow:hidden;background:#f5f5f5;color:rgba(0,0,0,.8);isolation:isolate}
 .suzhou-art{position:absolute;left:0;top:0;width:393px;height:524px;overflow:hidden;text-align:left;transform-origin:top left;background:#f5f5f5}
 .suzhou-title{position:absolute;top:40px;left:36px;width:321px;font-family:"FZYouHeiS","PingFang SC",sans-serif;font-size:44px;font-weight:600;line-height:50px;letter-spacing:-1px}
@@ -16,6 +16,7 @@
 .suzhou-preview .source-avatars img+img{margin-left:-3.511px}
 .suzhou-preview .response-status>.suzhou-source-arrow{width:12.2901px;height:12.2901px}
 .suzhou-preview .dots-markdown{font-size:14.046px;line-height:24.58px}
+.suzhou-preview p{margin:0}
 .suzhou-preview .dots-markdown p+p{margin-top:10.534px}
 .suzhou-preview .dots-markdown h4{font-size:14.046px;font-weight:600;line-height:21.069px;margin:14.046px 0 12.29px}
 .suzhou-preview .answer-actions{display:none}
