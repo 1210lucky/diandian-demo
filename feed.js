@@ -19,8 +19,8 @@ function setFeedVisible(show,animate=true){
   $('.phone').dataset.view=show?'feed':'note';
   feedPage.inert=animate||!show;
   detailSurfaces.forEach(el=>el.inert=animate||show);
-  $('.demo-jumps').hidden=show||isPagedNote;
-  $('#guideIntro').innerHTML=show?'左列体验上下滑动，<br>右上角体验左右翻页。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
+  $('.demo-jumps').hidden=show||isPagedNote||posterExperience.active;
+  $('#guideIntro').innerHTML=show?'方案1上下滑动，方案2左右翻页。<br>右列苏州封面是新增的方案3。':posterExperience.active?'整屏展示苏州旅行封面，<br>点击底部按钮，展开点点对话。':isPagedNote?'左右滑动阅读分页对话，<br>查看完整对话后继续追问。':'保留问题、回复和图文内容。<br>在卡片内部上下滑动，或按住拖动。';
   updateProgress();
   const finish=()=>{if(token!==feedTransitionToken)return;feedPage.hidden=!show;feedPage.inert=!show;detailSurfaces.forEach(el=>el.inert=show);if(animate)(show?activeFeedCard:$('#back')).focus({preventScroll:true})};
   if(animate){
@@ -34,9 +34,15 @@ function setFeedVisible(show,animate=true){
 function openFeedNote(event){
   if($('.phone').dataset.view!=='feed')return;
   activeFeedCard=event.currentTarget;
-  setNotePagination(activeFeedCard.id==='feedPagedTarget');
-  history.pushState({...history.state,demoView:'note',noteMode:isPagedNote?'paged':'scroll'},'');
+  const mode=activeFeedCard.id==='feedPosterTarget'?'poster':activeFeedCard.id==='feedPagedTarget'?'paged':'scroll';
+  setFeedNoteMode(mode);
+  history.pushState({...history.state,demoView:'note',noteMode:mode},'');
   setFeedVisible(false);
+}
+function setFeedNoteMode(mode){
+  posterExperience.setActive(false);
+  setNotePagination(mode==='paged');
+  posterExperience.setActive(mode==='poster');
 }
 function returnToFeed(){
   if(history.state?.demoView==='note')history.back();
@@ -54,10 +60,11 @@ window.addEventListener('popstate',event=>{
   askOverlay.hidden=true;askOverlay.classList.remove('is-open');setConversationMode(false);
   sourceNote.hidden=true;questionInput.blur();inertElements=[];sourceBackground=[];
   $('.workspace-header').inert=false;$('.demo-guide').inert=false;
-  if(event.state?.demoView==='note'){setNotePagination(event.state.noteMode==='paged');activeFeedCard=isPagedNote?$('#feedPagedTarget'):feedTarget}
+  if(event.state?.demoView==='note'){setFeedNoteMode(event.state.noteMode);activeFeedCard=posterExperience.active?$('#feedPosterTarget'):isPagedNote?$('#feedPagedTarget'):feedTarget}
   setFeedVisible(event.state?.demoView!=='note');
 });
 feedTarget.addEventListener('click',openFeedNote);
 $('#feedPagedTarget').addEventListener('click',openFeedNote);
+$('#feedPosterTarget').addEventListener('click',openFeedNote);
 $('#feedHome').addEventListener('click',()=>feedScroll.scrollTo({top:0,behavior:smooth}));
 setFeedVisible(true,false);

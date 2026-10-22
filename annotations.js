@@ -6,7 +6,7 @@
   const layer = document.createElement('div');
   layer.className = 'scheme-annotations';
   layer.setAttribute('aria-hidden', 'true');
-  const entries = ['feedTarget', 'feedPagedTarget'].map((id, i) => {
+  const entries = ['feedTarget', 'feedPagedTarget', 'feedPosterTarget'].map((id, i) => {
     const item = document.createElement('div');
     item.className = 'scheme-annotation';
     item.innerHTML = `<svg><path/><circle r="2"/></svg><span class="scheme-callout">方案${i + 1}</span>`;

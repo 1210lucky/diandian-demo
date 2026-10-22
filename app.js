@@ -14,7 +14,7 @@ const answer=$('#answerScroll'),note=$('#noteScroll'),sections=[...document.quer
 const smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
 let currentSection=0,toastTimer,comments=2;
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2300)}
-function updateProgress(){if($('.phone').dataset.view==='feed'){$('#guideState').textContent='点击新疆旅游攻略，开始体验';return}if(window.pagedReadingPosition){$('#guideState').textContent='左右翻页 · '+$('#answerPageCount').textContent;return}const max=answer.scrollHeight-answer.clientHeight;const progress=max>0?Math.min(100,Math.max(0,Math.round(answer.scrollTop/max*100))):100;let title='原问题';const top=answer.getBoundingClientRect().top;sections.forEach(s=>{if(s.getBoundingClientRect().top<=top+75)title=s.dataset.readingTitle});$('#guideState').textContent=progress===0?'等待开始阅读':progress>=99?'已读完 · 100%':'正在阅读 · '+title+' · '+progress+'%'}
+function updateProgress(){if($('.phone').dataset.view==='feed'){$('#guideState').textContent='点击对应封面，开始体验';return}if(window.posterExperience?.active){$('#guideState').textContent='方案3 · 封面展开';return}if(window.pagedReadingPosition){$('#guideState').textContent='左右翻页 · '+$('#answerPageCount').textContent;return}const max=answer.scrollHeight-answer.clientHeight;const progress=max>0?Math.min(100,Math.max(0,Math.round(answer.scrollTop/max*100))):100;let title='原问题';const top=answer.getBoundingClientRect().top;sections.forEach(s=>{if(s.getBoundingClientRect().top<=top+75)title=s.dataset.readingTitle});$('#guideState').textContent=progress===0?'等待开始阅读':progress>=99?'已读完 · 100%':'正在阅读 · '+title+' · '+progress+'%'}
 answer.addEventListener('scroll',updateProgress,{passive:true});new ResizeObserver(updateProgress).observe(answer);
 function jumpTo(el){const scale=answer.getBoundingClientRect().height/answer.offsetHeight;answer.scrollTo({top:answer.scrollTop+(el.getBoundingClientRect().top-answer.getBoundingClientRect().top)/scale,behavior:smooth})}
 document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpTo(document.getElementById(b.dataset.jump))));
@@ -106,6 +106,7 @@ function cancelConversationTransition(){
   askOverlay.style.visibility='';
 }
 function conversationSource(){
+  if(window.posterExperience?.active)return window.posterExperience.source();
   const card=$('.ai-card'),rect=card.getBoundingClientRect(),viewport=note.getBoundingClientRect();
   const top=Math.max(rect.top,viewport.top),bottom=Math.min(rect.bottom,viewport.bottom);
   const element=bottom>top?card:$('#viewConversation');
