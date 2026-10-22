@@ -16,7 +16,7 @@ function consumeVerticalScroll(delta,inCard){
   note.scrollTop=Math.max(0,Math.min(scrollLimit(note),note.scrollTop+delta));
 }
 note.addEventListener('pointerdown',event=>{
-  if(isPagedNote||verticalPhone.dataset.view!=='note'||!askOverlay.hidden||event.button!==0||!event.isPrimary||interactiveReadingTarget(event.target))return;
+  if(window.posterExperience?.active||isPagedNote||verticalPhone.dataset.view!=='note'||!askOverlay.hidden||event.button!==0||!event.isPrimary||interactiveReadingTarget(event.target))return;
   verticalGesture={id:event.pointerId,x:event.clientX,y:event.clientY,lastY:event.clientY,time:performance.now(),velocity:0,moved:false,card:!!event.target.closest('.media-area')};
 });
 note.addEventListener('pointermove',event=>{

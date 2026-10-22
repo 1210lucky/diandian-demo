@@ -20,15 +20,52 @@
 .suzhou-preview .dots-markdown h4{font-size:14.046px;font-weight:600;line-height:21.069px;margin:14.046px 0 12.29px}
 .suzhou-preview .answer-actions{display:none}
 .suzhou-fade{position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(180deg,rgba(245,245,245,0),#f5f5f5);pointer-events:none}
+
+/* Full-height note: keep the author's header and the normal engagement toolbar. */
 .poster-note[hidden]{display:none}
-.poster-note{height:100%;display:flex;flex-direction:column;background:#f5f5f5}
-.poster-detail-cover{flex:1;min-height:0}
-.poster-footer{height:92px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;background:#f5f5f5}
-.poster-footer button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:10px 24px;border-radius:99px;background:white;border:.5px solid rgba(0,0,0,.06);box-shadow:0 4px 24px rgba(0,0,0,.07);color:rgba(0,0,0,.62);font-size:14px;font-weight:500;line-height:22px}
-.poster-footer .home-indicator{margin:27px auto 0}
-.poster-mode>.note-scroll{overflow:hidden;min-height:0;touch-action:pan-y}
-.poster-mode>.note-scroll>.media-area,.poster-mode>.note-scroll>.note-body,.poster-mode>.note-scroll>.comments,.poster-mode>.engage-bar{display:none}
-.poster-mode .conversation-mode .suzhou-query{width:fit-content;max-width:293px}
-.poster-mode .conversation-mode .suzhou-response .response-status{letter-spacing:0}
-.poster-mode .conversation-mode .suzhou-source-arrow{width:12.2901px;height:12.2901px}
-@media(max-width:480px){.poster-footer{height:calc(72px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)}}
+.poster-note{height:100%;display:flex;flex-direction:column;position:relative;background:#f5f5f5;color:rgba(0,0,0,.8)}
+.poster-detail-scroll{flex:1;min-height:0;overflow:auto;scrollbar-width:none;touch-action:pan-y;overscroll-behavior-y:auto;cursor:grab;overflow-anchor:none}
+.poster-detail-scroll::-webkit-scrollbar{display:none}
+.poster-detail-scroll img{-webkit-user-drag:none;user-select:none}
+.poster-footer{height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#f5f5f5}
+.poster-footer button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 16px;border-radius:99px;background:rgba(255,255,255,.94);border:.5px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.06);color:rgba(0,0,0,.62);font-size:12px;font-weight:500;line-height:20px}
+.poster-mode>.note-scroll{min-height:0;touch-action:pan-y;overflow-anchor:none}
+.poster-mode>.note-scroll>.media-area{display:none}
+
+/* Figma 1687:50216, used without layout changes in the note and the reader. */
+.su-thread{padding:20px 0;font-family:"PingFang SC",-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;line-height:28px;color:rgba(0,0,0,.8);background:#f5f5f5;text-align:left;overflow-wrap:break-word}
+.su-thread p,.su-thread h4,.su-thread h5{margin:0;font-size:16px;line-height:28px;letter-spacing:0;color:rgba(0,0,0,.8)}
+.su-thread strong,.su-thread h4,.su-thread h5{font-weight:600}
+.su-thread h4{line-height:24px}
+.su-user-row{padding:4px 16px 16px;display:flex;justify-content:flex-end}
+.su-user-bubble{padding:12px 16px;border-radius:18px;background:rgba(0,0,0,.08);max-width:293px}
+.su-user-bubble p{max-width:261px}
+.su-answer-row{padding:4px 16px 16px}
+.su-answer{display:flex;flex-direction:column;gap:20px;overflow:hidden;padding:20px 16px;border-radius:22px;background:#fff}
+.su-answer-content{display:flex;flex-direction:column;gap:14px}
+.su-status{display:flex;gap:4px;align-items:center;min-height:20px;font-size:14px;line-height:20px;color:rgba(0,0,0,.45);white-space:nowrap}
+.su-status>b,.su-status b{font-weight:400;color:rgba(0,0,0,.62)}
+.su-status>img{flex:none}
+.su-avatars{display:flex;align-items:center;padding-right:0;flex:none}
+.su-avatars img{width:18px;height:18px;border-radius:50%;margin:-1px}
+.su-avatars img+img{margin-left:-3px}
+.su-content{display:flex;flex-direction:column;gap:16px}
+.su-itinerary{display:flex;flex-direction:column;gap:14px}
+.su-section,.su-stack{display:flex;flex-direction:column;gap:12px}
+.su-days,.su-food{display:flex;flex-direction:column;gap:16px}
+.su-bullet{display:flex;align-items:flex-start;gap:0;min-width:0}
+.su-bullet-icon{flex:none}
+.su-bullet-body{display:flex;flex-direction:column;gap:12px;flex:1;min-width:0}
+.su-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.su-gallery img{width:100%;aspect-ratio:1;height:auto;object-fit:cover;border-radius:16px}
+.su-portrait-row{padding:0 22px}
+.su-portrait{position:relative;width:165px;height:220px;border-radius:16px;overflow:hidden}
+.su-portrait img{position:absolute;max-width:none;object-fit:fill}
+.su-photo-0 img{width:108.81%;height:108.67%;left:-4.41%;top:-.14%}
+.su-photo-7 img{width:107.48%;height:107.48%;left:-3.95%;top:-.06%}
+.su-actions{display:flex;justify-content:space-between;gap:8px}
+.su-actions>div{display:flex;align-items:center;gap:8px}
+.su-actions button{padding:8px;border-radius:8px;background:rgba(48,48,52,.05);cursor:default;opacity:1}
+.poster-mode .conversation-mode.reading-mode .sheet-space{padding:0 0 88px}
+.poster-mode .recommendation-mode .sheet-space{padding:0 0 88px}
+@media(max-width:360px){.su-status{font-size:12px;gap:3px}}
