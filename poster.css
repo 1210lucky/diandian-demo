@@ -54,5 +54,7 @@
 .su-actions>div{display:flex;align-items:center;gap:8px}
 .su-actions button{padding:8px;border-radius:8px;background:rgba(48,48,52,.05);cursor:default;opacity:1}
 .poster-mode .conversation-mode.reading-mode .sheet-space{padding:0 0 88px}
-.poster-mode .recommendation-mode .sheet-space{padding:0 0 88px}
+.poster-mode .recommendation-mode .sheet-space{padding:0 0 32px}
+.poster-mode .recommendation-mode .new-topic{padding:0 16px}
+.poster-mode .recommendation-mode .su-thread,.poster-mode .recommendation-mode .su-answer-row{padding-bottom:0}
 @media(max-width:360px){.su-status{font-size:12px;gap:3px}}

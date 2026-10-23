@@ -207,5 +207,83 @@
     return handle;
   }
 
-  window.demoMotion = Object.freeze({ capture, transition, cancel });
+  // Note → reader keeps the text at its reading anchor. Only the note chrome
+  // withdraws; the centre is never scaled like a feed thumbnail.
+  function revealConversation({ noteSnapshot, readerSnapshot, top, bottom, reverse = false, duration = 360, onFinish }) {
+    cancel();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { onFinish?.(); return { cancel() {} }; }
+    const { phone, rect, zoom } = phoneMetrics();
+    const height = rect.height / zoom;
+    top = Math.max(0, Math.min(height, (top - rect.top) / zoom));
+    bottom = Math.max(top, Math.min(height, (bottom - rect.top) / zoom));
+    const run = { layer: null, animations: [], done: false };
+    active = run;
+    const layer = document.createElement('div');
+    layer.className = 'demo-motion-layer conversation-reveal';
+    layer.inert = true;
+    layer.setAttribute('aria-hidden', 'true');
+    layer.style.cssText = 'position:absolute;inset:0;z-index:60;overflow:hidden;pointer-events:none;background:#f5f5f5;';
+    run.layer = layer;
+    const restore = [];
+    function duplicate(snapshot) {
+      const clone = snapshot.cloneNode(true), metadata = snapshots.get(snapshot);
+      const originals = [snapshot, ...snapshot.querySelectorAll('*')];
+      const copies = [clone, ...clone.querySelectorAll('*')];
+      metadata.scrolls.forEach(({ node, left, top }) => restore.push({ node: copies[originals.indexOf(node)], left, top }));
+      return clone;
+    }
+    function frame(snapshot, clip) {
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+      wrapper.style.clipPath = clip;
+      wrapper.append(duplicate(snapshot)); layer.append(wrapper);
+      return wrapper;
+    }
+    const centre = frame(noteSnapshot, `inset(${top}px 0 ${height - bottom}px)`);
+    const reader = frame(readerSnapshot, 'inset(0)');
+    const upper = frame(noteSnapshot, `inset(0 0 ${height - top}px)`);
+    const lower = frame(noteSnapshot, `inset(${bottom}px 0 0)`);
+    upper.style.transformOrigin = 'center top';
+    lower.style.transformOrigin = 'center bottom';
+    phone.append(layer);
+    layer.getBoundingClientRect();
+    restore.forEach(({node, top, left}) => { node.scrollTop = top; node.scrollLeft = left; });
+    const options = { duration, easing: 'cubic-bezier(.22,.75,.2,1)', fill: 'both', direction: reverse ? 'reverse' : 'normal' };
+    const animate = (element, frames) => run.animations.push(element.animate(frames, options));
+    animate(upper, [{ transform: 'translateY(0) scaleY(1)', opacity: 1 }, { transform: `translateY(${-top}px) scaleY(.86)`, opacity: 0 }]);
+    animate(lower, [{ transform: 'translateY(0) scaleY(1)', opacity: 1 }, { transform: `translateY(${height - bottom}px) scaleY(.92)`, opacity: 0 }]);
+    animate(centre, [{ opacity: 1 }, { opacity: 0 }]);
+    animate(reader, [{ clipPath: `inset(${top}px 0 ${height - bottom}px)`, opacity: 0 }, { clipPath: 'inset(0px 0 0px)', opacity: 1 }]);
+    Promise.all(run.animations.map(animation => animation.finished)).then(() => {
+      if (run.done || active !== run) return;
+      cleanup(run); onFinish?.();
+    }, () => {});
+    return { cancel: () => cleanup(run) };
+  }
+
+  // Personal conversation opens as the next page, retaining the shared answer
+  // while the new-topic section and composer arrive from below.
+  function continueConversation({ fromSnapshot, toSnapshot, duration = 340, onFinish }) {
+    cancel();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { onFinish?.(); return { cancel() {} }; }
+    const { phone } = phoneMetrics();
+    const run = { layer: null, animations: [], done: false }; active = run;
+    const layer = document.createElement('div');
+    layer.className = 'demo-motion-layer personal-conversation-transition';
+    layer.inert = true; layer.setAttribute('aria-hidden', 'true');
+    layer.style.cssText = 'position:absolute;inset:0;z-index:60;overflow:hidden;pointer-events:none;background:#f5f5f5;';
+    layer.append(fromSnapshot, toSnapshot); phone.append(layer); run.layer = layer;
+    layer.getBoundingClientRect();
+    [fromSnapshot, toSnapshot].forEach(snapshot => snapshots.get(snapshot).scrolls.forEach(({node,top,left}) => {node.scrollTop=top;node.scrollLeft=left}));
+    const options = {duration, easing:'cubic-bezier(.22,.75,.2,1)', fill:'both'};
+    run.animations.push(fromSnapshot.animate([{transform:'translateX(0)',opacity:1},{transform:'translateX(-18%)',opacity:.4}],options));
+    run.animations.push(toSnapshot.animate([{transform:'translateX(100%)'},{transform:'translateX(0)'}],options));
+    Promise.all(run.animations.map(animation=>animation.finished)).then(()=>{
+      if(run.done||active!==run)return;
+      cleanup(run);onFinish?.();
+    },()=>{});
+    return {cancel:()=>cleanup(run)};
+  }
+
+  window.demoMotion = Object.freeze({ capture, transition, revealConversation, continueConversation, cancel });
 })();

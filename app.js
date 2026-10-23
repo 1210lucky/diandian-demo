@@ -36,7 +36,7 @@ const suggestions=[
  ['每晚住哪更顺路','按这条伊犁环线，10天里每晚住在哪个城市或景区附近更顺路？我们6个人怎么订房合适？'],
  ['独库没开怎么绕行','如果出发时独库公路没有开放，这份10天伊犁环线应该怎么改，才能顺路返回乌鲁木齐？']
 ];
-function syncQuestion(){ $('#sendAsk').disabled=!questionInput.value.trim();$('#askFeedback').textContent=''; }
+function syncQuestion(){ const hasText=!!questionInput.value.trim();$('#sendAsk').disabled=!hasText;askSheet.classList.toggle('has-draft',hasText);$('#askFeedback').textContent=''; }
 for(const [label] of suggestions){const button=document.createElement('button');button.type='button';button.className='sheet-suggestion';button.disabled=true;button.append(document.createTextNode(label));const icon=document.createElement('img');icon.src='assets/sheet-sug-arrow.svg';icon.alt='';button.append(icon);$('#askSuggestions').append(button)}
 let previousFocus,inertElements=[],closeTimer,conversationMode=false;
 // Match content anchors rather than scroll percentages, which change when text reflows.
@@ -85,53 +85,49 @@ for(const original of [...answer.children].filter(el=>!el.matches('.ai-header,.c
 let conversationPositionToken=0;
 function setConversationMode(full,position='bottom'){
   const token=++conversationPositionToken;
-  setRecommendationBackground(false);
   askSheet.classList.remove('recommendation-mode','query-mode');$('#recommendedQueries').hidden=true;$('#followupMessages').replaceChildren();
   const reading=full&&typeof position==='object'&&position.reading===true;
   conversationMode=full;askSheet.classList.toggle('conversation-mode',full);askSheet.classList.toggle('reading-mode',reading);askSheet.classList.remove('keyboard-open');
   askSheet.classList.toggle('vertical-reading',reading&&!window.pagedReadingPosition);
   $('#sharedConversation').hidden=!full&&!reading;$('#newTopic').hidden=!full||position!=='bottom';$('#expandAsk').hidden=full||reading;$('#readerFooter').hidden=!reading;
-  $('#closeAsk').setAttribute('aria-label',full?'返回小红书笔记':reading?'关闭完整对话':'关闭问点点');
+  $('#closeAsk').setAttribute('aria-label',reading?'关闭完整对话':full?'返回小红书笔记':'关闭问点点');
   const closeIcon=$('#closeAsk img'),titleIcon=$('#sheetTitle img');
-  closeIcon.src=full?'assets/back.svg':reading?'assets/reader-close.svg':'assets/sheet-close.svg';closeIcon.width=closeIcon.height=full?22:reading?20:22;
+  closeIcon.src=reading?'assets/reader-close.svg':full?'assets/back.svg':'assets/sheet-close.svg';closeIcon.width=closeIcon.height=reading?20:22;
   titleIcon.src='assets/sheet-logo.svg';titleIcon.width=titleIcon.height=24;
   $('#askFeedback').textContent='';$('#conversationScroll').style.paddingBottom='';
   const place=()=>{if(token!==conversationPositionToken)return;const scroller=$('#conversationScroll');if(full&&typeof position==='object')restoreReadingPosition(position);else scroller.scrollTop=full&&position==='bottom'?scroller.scrollHeight:0};
   place();if(full)requestAnimationFrame(place);
 }
-let conversationEntryAnimation,conversationEntryToken=0;
+let conversationEntryAnimation,conversationEntryToken=0,personalScrollFrame=0;
+function captureNoteChrome(){
+  const phone=$('.phone'),frame=phone.getBoundingClientRect();
+  const card=window.posterExperience?.active?$('#posterNote'):$('.ai-card');
+  const cardRect=card.getBoundingClientRect(),viewport=note.getBoundingClientRect();
+  const footer=card.querySelector('footer').getBoundingClientRect();
+  return {noteSnapshot:demoMotion.capture([phone.querySelector(':scope > .note-header'),note,phone.querySelector(':scope > .engage-bar')],{surface:'phone'}),top:Math.max(frame.top,viewport.top,cardRect.top),bottom:Math.max(viewport.top,Math.min(footer.top,viewport.bottom))};
+}
 function cancelConversationTransition(){
-  ++conversationEntryToken;++conversationPositionToken;
+  ++conversationEntryToken;++conversationPositionToken;cancelAnimationFrame(personalScrollFrame);
   conversationEntryAnimation?.cancel();conversationEntryAnimation=null;
   askOverlay.style.visibility='';
 }
-function conversationSource(){
-  if(window.posterExperience?.active)return window.posterExperience.source();
-  const card=$('.ai-card'),rect=card.getBoundingClientRect(),viewport=note.getBoundingClientRect();
-  const top=Math.max(rect.top,viewport.top),bottom=Math.min(rect.bottom,viewport.bottom);
-  const element=bottom>top?card:$('#viewConversation');
-  const inset=16*(rect.width/card.offsetWidth||1);
-  const clipRect=element===card?{left:rect.left+inset,top,width:rect.width-inset*2,height:bottom-top}:element.getBoundingClientRect();
-  return {element,rect:clipRect,snapshot:demoMotion.capture(element,{surface:'card',clipRect})};
-}
 function enterFullConversation(position='bottom',origin){
-  const source=origin||conversationSource();
+  const chrome=origin||captureNoteChrome();
   cancelConversationTransition();const token=conversationEntryToken;
   questionInput.blur();askOverlay.style.visibility='hidden';
   setConversationMode(true,position);askOverlay.classList.add('is-open');
   // The position callback queued by setConversationMode runs first, at the final layout size.
   requestAnimationFrame(()=>{
     if(token!==conversationEntryToken||askOverlay.hidden)return;
-    conversationEntryAnimation=demoMotion.transition({
-      fromRect:source.rect,toRect:askSheet.getBoundingClientRect(),
-      fromSnapshot:source.snapshot,toSnapshot:demoMotion.capture(askSheet,{surface:'conversation'}),
+    conversationEntryAnimation=demoMotion.revealConversation({
+      ...chrome,readerSnapshot:demoMotion.capture(askSheet,{surface:'conversation'}),
       onFinish:()=>{if(token!==conversationEntryToken)return;askOverlay.style.visibility='';$('#closeAsk').focus({preventScroll:true})}
     });
   });
 }
 function openAsk(full=false,position='bottom'){
   clearTimeout(closeTimer);previousFocus=document.activeElement;
-  const origin=full?conversationSource():null;
+  const origin=full?captureNoteChrome():null;
   askOverlay.hidden=false;
   inertElements=[...$('.phone').children].filter(el=>el!==askOverlay&&!el.inert);
   inertElements.push($('.workspace-header'),$('.demo-guide'));inertElements.forEach(el=>el.inert=true);
@@ -148,10 +144,9 @@ function closeAsk(){
     finishAskClose();
   };
   if(conversationMode){
-    const source=conversationSource();
-    const fromRect=askSheet.getBoundingClientRect(),fromSnapshot=demoMotion.capture(askSheet,{surface:'conversation'});
+    const chrome=captureNoteChrome(),readerSnapshot=demoMotion.capture(askSheet,{surface:'conversation'});
     askOverlay.style.visibility='hidden';
-    conversationEntryAnimation=demoMotion.transition({fromRect,toRect:source.rect,fromSnapshot,toSnapshot:source.snapshot,onFinish:finish});
+    conversationEntryAnimation=demoMotion.revealConversation({...chrome,readerSnapshot,reverse:true,onFinish:finish});
   }else{askOverlay.classList.remove('is-open');closeTimer=setTimeout(finish,smooth==='auto'?0:240)}
 }
 function finishAskClose(){
@@ -161,26 +156,42 @@ function finishAskClose(){
 $('#viewConversation').addEventListener('click',()=>openAsk(true,{...captureReadingPosition(),reading:true}));
 let readerReturnScroll=0;
 function returnToReader(){
+  cancelConversationTransition();
   questionInput.blur();setConversationMode(true,{reading:true});
   $('#conversationScroll').scrollTop=readerReturnScroll;
   $('#askAlso').focus({preventScroll:true});
 }
-function setRecommendationBackground(active){
-  $('#recommendationDismiss').hidden=!active;
-  askSheet.querySelector('.sheet-header').inert=active;
-  $('#conversationScroll').inert=active;
-}
 function openRecommendedQueries(){
   readerReturnScroll=$('#conversationScroll').scrollTop;
-  askSheet.classList.remove('reading-mode','query-mode');
-  askSheet.classList.add('recommendation-mode','keyboard-open');
-  $('#readerFooter').hidden=true;$('#recommendedQueries').hidden=false;$('#newTopic').hidden=true;
+  const fromSnapshot=demoMotion.capture(askSheet,{surface:'conversation'});
+  cancelConversationTransition();const token=conversationEntryToken;
+  questionInput.blur();askOverlay.style.visibility='hidden';
+  askSheet.classList.remove('reading-mode','query-mode','keyboard-open');
+  askSheet.classList.add('recommendation-mode');
+  $('#readerFooter').hidden=true;$('#recommendedQueries').hidden=false;$('#newTopic').hidden=false;
   $('#closeAsk').setAttribute('aria-label','返回完整对话');
+  $('#closeAsk img').src='assets/back.svg';
   questionInput.value='';syncQuestion();
-  setRecommendationBackground(true);$('#conversationScroll').scrollTop=readerReturnScroll;
+  const scroller=$('#conversationScroll');
+  const target=Math.max(0,scroller.scrollHeight-scroller.clientHeight);
+  const start=Math.max(0,target-100);
+  scroller.scrollTop=start;
+  conversationEntryAnimation=demoMotion.continueConversation({fromSnapshot,toSnapshot:demoMotion.capture(askSheet,{surface:'conversation'}),onFinish:()=>{
+    if(token!==conversationEntryToken)return;
+    askOverlay.style.visibility='';$('#closeAsk').focus({preventScroll:true});
+    if(smooth==='auto'){scroller.scrollTop=target;return}
+    const began=performance.now();
+    const settle=now=>{
+      if(token!==conversationEntryToken)return;
+      const progress=Math.min(1,(now-began)/420);
+      scroller.scrollTop=start+(target-start)*(1-Math.pow(1-progress,3));
+      if(progress<1)personalScrollFrame=requestAnimationFrame(settle);
+    };
+    personalScrollFrame=requestAnimationFrame(settle);
+  }});
 }
 function chooseRecommendedQuery(text){
-  setRecommendationBackground(false);
+  cancelConversationTransition();
   askSheet.classList.remove('recommendation-mode','keyboard-open');askSheet.classList.add('query-mode');
   $('#recommendedQueries').hidden=true;$('#sharedConversation').hidden=true;$('#newTopic').hidden=true;
   $('#closeAsk img').src='assets/query-back.svg';$('#closeAsk img').width=$('#closeAsk img').height=24;
@@ -192,14 +203,18 @@ function chooseRecommendedQuery(text){
 }
 $('#recommendedQueries').addEventListener('click',event=>{const button=event.target.closest('button');if(button)chooseRecommendedQuery(button.dataset.query)});
 $('#askAlso').addEventListener('click',openRecommendedQueries);
-$('#recommendationDismiss').addEventListener('click',returnToReader);
 $('#closeAsk').addEventListener('click',closeAsk);$('#askScrim').addEventListener('click',closeAsk);
 $('#expandAsk').addEventListener('click',()=>enterFullConversation('bottom'));
-questionInput.addEventListener('focus',()=>{if(conversationMode)askSheet.classList.add('keyboard-open')});
-$('#conversationScroll').addEventListener('pointerdown',()=>{if(askSheet.classList.contains('recommendation-mode')){returnToReader();return}if(conversationMode){questionInput.blur();askSheet.classList.remove('keyboard-open')}});
+questionInput.addEventListener('focus',()=>{
+  if(!conversationMode)return;
+  const scroller=$('#conversationScroll'),atBottom=scroller.scrollHeight-scroller.clientHeight-scroller.scrollTop<2;
+  askSheet.classList.add('keyboard-open');
+  if(atBottom)scroller.scrollTo({top:scroller.scrollHeight,behavior:smooth});
+});
+$('#conversationScroll').addEventListener('pointerdown',()=>{cancelAnimationFrame(personalScrollFrame);if(conversationMode){questionInput.blur();askSheet.classList.remove('keyboard-open')}});
 questionInput.addEventListener('input',syncQuestion);
 $('#askForm').addEventListener('submit',e=>{e.preventDefault();if(askSheet.classList.contains('recommendation-mode')&&questionInput.value.trim()){chooseRecommendedQuery(questionInput.value.trim());return}$('#askFeedback').textContent=questionInput.value.trim()?'当前为交互演示，尚未接入 AI。问题已保留，可以继续修改。':'先写下你想问的问题。';if(conversationMode){questionInput.blur();askSheet.classList.remove('keyboard-open');$('#askFeedback').scrollIntoView({block:'nearest',behavior:smooth})}});
-for(const id of ['askVoice','askAdd'])$('#'+id).addEventListener('click',()=>{$('#askFeedback').textContent='当前演示支持文字追问，可以点选上方推荐问题。'});
+for(const id of ['askVoice','askCamera','askAdd'])$('#'+id).addEventListener('click',()=>{$('#askFeedback').textContent='当前演示支持文字追问，可以点选上方推荐问题。'});
 askSheet.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeAsk()}if(e.key==='Tab'){const focusable=[...askSheet.querySelectorAll('button:not(:disabled),input')].filter(el=>el.getClientRects().length&&el.tabIndex>=0&&!el.closest('[inert]'));const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
 // The demo keyboard also handles touch input without opening the system keyboard.
 let shifted=false,numberMode=false,emojiMode=false;

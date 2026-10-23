@@ -83,22 +83,31 @@
 .ask-also{position:absolute;left:50%;bottom:28px;transform:translateX(-50%)}
 .reader-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#111}
 .conversation-mode.reading-mode .sheet-space{padding-bottom:96px}
+/* Personal conversation — FullSizeRender.mov and the supplied October reference. */
 .recommended-queries[hidden]{display:none}
-.recommended-queries{position:relative;z-index:2;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:10px 30px 18px}
-.recommended-queries button{display:flex;align-items:center;gap:6px;padding:0;text-align:left;font-size:15px;line-height:22px;color:var(--dots-title)}
-.query-arrow{display:grid;place-items:center;flex:none;width:18px;height:18px;padding:3px;border-radius:6px;background:rgba(48,48,52,.05)}.query-arrow img{transform:rotate(90deg)}
-/* Preserve the full reading canvas behind the Figma recommendation overlay. */
 .conversation-mode .chat-statusbar{height:54px;padding:18px 17px 16px 25px;background:var(--dots-bg-0)}
-.recommendation-mode .chat-statusbar{background:#fff}
-.recommended-queries button:disabled{cursor:default;opacity:1;-webkit-text-fill-color:var(--dots-title)}
-.recommendation-dismiss[hidden]{display:none}
-.recommendation-dismiss{position:absolute;inset:54px 0 336px;z-index:1;padding:0;border:0;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:default}
-.recommendation-mode .sheet-header{z-index:0}
-.recommendation-mode .sheet-space{position:absolute;top:110px;left:0;right:0;bottom:0;padding:16px 16px 96px}
-.recommendation-mode .recommended-queries{position:absolute;left:0;right:0;bottom:396px}
-.recommendation-mode .sheet-composer{position:absolute;left:12px;right:12px;bottom:348px;margin:0;z-index:2}
-.recommendation-mode .sheet-keyboard{position:absolute;left:0;right:0;bottom:0;z-index:2}
-@media(max-width:480px){.ask-also{bottom:max(24px,calc(env(safe-area-inset-bottom,0px) + 8px))}.reader-home{display:none}.recommendation-dismiss{top:0}.recommendation-mode .sheet-space{top:56px}}
+.recommendation-mode .sheet-header{border-bottom:0}
+.recommendation-mode .answer-action[data-answer-action="collect"]{display:none}
+.recommendation-mode .query-more{display:grid;place-items:center;width:30px;height:30px;padding:3px;margin-left:auto;cursor:default}
+.conversation-mode .new-topic{padding:0}
+.conversation-mode .new-topic-divider{text-align:center;font-size:12px;line-height:20px;color:#b8b8b8;padding:24px 0}
+.new-topic-greeting{max-width:300px;border-radius:24px;padding:12px 16px;background:#fff;margin-bottom:12px}
+.conversation-mode .new-topic-greeting p{font-size:16px;line-height:28px;color:var(--dots-title)}
+.recommended-queries{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:0}
+.recommended-queries button{max-width:100%;border-radius:26px;background:#ebebeb;padding:12px 16px;text-align:left;font-size:15px;line-height:22px;color:var(--dots-title)}
+.recommended-queries button:active{background:#e1e1e1}
+.recommendation-mode .sheet-space{padding-bottom:32px}
+.conversation-mode .personal-composer{height:48px;min-height:48px;margin:0 12px;padding:10px 14px;border:1px solid #d2d2d2;border-radius:16px;background:linear-gradient(#fafafa,#f7f7f7);box-shadow:inset 0 0 2px 1px #fff;gap:12px;z-index:2}
+.conversation-mode .personal-composer input{font-size:16px}
+.conversation-mode .personal-composer .composer-icon:last-child{margin-left:0}
+.conversation-mode .composer-send,.conversation-mode.has-draft .composer-camera{display:none}
+.conversation-mode.has-draft .composer-send{display:block}
+.composer-camera,.ai-disclaimer{display:none}
+.conversation-mode .composer-camera{display:block}
+.conversation-mode .ai-disclaimer{display:block;flex:none;margin:0;padding:10px 0 24px;text-align:center;font-size:10px;line-height:16px;color:#d1d1d1}
+.reading-mode .ai-disclaimer,.conversation-mode.keyboard-open .ai-disclaimer{display:none}
+.conversation-mode.keyboard-open .personal-composer{margin-bottom:10px}
+@media(max-width:480px){.ask-also{bottom:max(24px,calc(env(safe-area-inset-bottom,0px) + 8px))}.reader-home{display:none}.conversation-mode .ai-disclaimer{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}}
 
 /* Sent query — Figma 1550:49144: compact header and content-sized question. */
 .query-more{display:none}

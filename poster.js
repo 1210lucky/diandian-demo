@@ -5,7 +5,7 @@
   const shared=$('#sharedMessages'),originalMessages=[...shared.childNodes];
   const queryButtons=[...$('#recommendedQueries').querySelectorAll('button')];
   const originalQueries=queryButtons.map(button=>button.dataset.query);
-  const suzhouQueries=['还有什么小众玩法？','帮我安排一条苏州美食路线','带爸妈去苏州，怎么安排更轻松？'];
+  const suzhouQueries=['苏州秋天有哪些适合拍照的景点？','推荐一些踏秋好去处','最近有什么好看的电影？'];
   const noteText=[[$('.note-body h2'),'苏州三日游旅行攻略'],[$('.note-body>p'),'点点帮我整理了苏州三天两晚的旅行攻略，路线、景点、美食和住宿都在上面的对话里。'],[$('.note-body .hashtags'),'#有问题问点点 #点点AI #苏州旅游'],[$('#comments .comment p'),'这份苏州行程很实用！'],[$('#comments .comment:nth-of-type(2) p'),'准备收藏，去苏州时用']].map(([element,text])=>({element,text,original:element.textContent}));
   let active=false,gesture=null;
 
