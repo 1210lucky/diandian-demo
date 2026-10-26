@@ -3,7 +3,9 @@
 .suzhou-art{position:absolute;left:0;top:0;width:393px;height:524px;overflow:hidden;text-align:left;transform-origin:top left;background:#f5f5f5}
 .suzhou-title{position:absolute;top:40px;left:36px;width:321px;font-family:"FZYouHeiS","PingFang SC",sans-serif;font-size:44px;font-weight:600;line-height:50px;letter-spacing:-1px}
 .suzhou-subtitle{position:absolute;top:148px;left:36px;display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;color:rgba(0,0,0,.45);white-space:nowrap}
-.suzhou-subtitle img{flex:none}
+/* Draw the hairline in CSS: subpixel SVG image dimensions can fail on mobile WebKit. */
+.suzhou-subtitle>span{display:inline-flex;align-items:center;flex:none}
+.suzhou-subtitle>span+span:before{content:"";height:14px;border-left:.5px solid rgba(0,0,0,.2);margin-right:8px}
 .suzhou-device{position:absolute;left:24px;right:24px;top:200px;bottom:-17px;border-radius:40px 40px 0 0;background:#fafafa;box-shadow:0 8px 40px rgba(0,0,0,.16);overflow:hidden}
 .cover-dialogue{width:393px;transform:scale(calc(345 / 393));transform-origin:top left;background:#f5f5f5;pointer-events:none;user-select:none;color:var(--dots-title)}
 .cover-dialogue .sheet-space{overflow:clip;min-height:0}

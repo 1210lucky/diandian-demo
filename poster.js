@@ -21,9 +21,9 @@
     const preview=frame.querySelector('.cover-dialogue-messages');
     if(title){
       frame.querySelector('.suzhou-title').replaceChildren(title[0],document.createElement('br'),title[1]);
-      const subtitle=frame.querySelector('.suzhou-subtitle'),divider=subtitle.querySelector('img').cloneNode(true);
+      const subtitle=frame.querySelector('.suzhou-subtitle');
       subtitle.replaceChildren();
-      xinjiangTags.forEach((text,index)=>{if(index)subtitle.append(divider.cloneNode(true));const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
+      xinjiangTags.forEach(text=>{const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
       preview.append(...originalMessages.map(message=>message.cloneNode(true)));
     }else{
       screen.classList.add('cover-dialogue-suzhou');

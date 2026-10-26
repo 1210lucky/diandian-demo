@@ -156,7 +156,8 @@
 .paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .phone>.note-scroll img{-webkit-user-drag:none}
 /* Vertical notes keep their original card size; full-reader taps never toggle it closed. */
-.phone:not(.paged-mode)>.note-scroll,.phone:not(.paged-mode) .answer-scroll{touch-action:pinch-zoom}
+/* Scheme 3 uses native note scrolling; only scheme 1 needs custom nested scrolling. */
+.phone:not(.paged-mode):not(.poster-mode)>.note-scroll,.phone:not(.paged-mode):not(.poster-mode) .answer-scroll{touch-action:pinch-zoom}
 .reading-mode .sheet-space{touch-action:pan-y}
 .reading-mode .sheet-space img{-webkit-user-drag:none}
 .scheme-annotations{position:fixed;inset:0;pointer-events:none;z-index:40;color:#1768e8}

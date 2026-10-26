@@ -182,7 +182,8 @@
 .paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .phone>.note-scroll img{-webkit-user-drag:none}
 /* Vertical notes keep their original card size; full-reader taps never toggle it closed. */
-.phone:not(.paged-mode)>.note-scroll,.phone:not(.paged-mode) .answer-scroll{touch-action:pinch-zoom}
+/* Scheme 3 uses native note scrolling; only scheme 1 needs custom nested scrolling. */
+.phone:not(.paged-mode):not(.poster-mode)>.note-scroll,.phone:not(.paged-mode):not(.poster-mode) .answer-scroll{touch-action:pinch-zoom}
 .reading-mode .sheet-space{touch-action:pan-y}
 .reading-mode .sheet-space img{-webkit-user-drag:none}
 .scheme-annotations{position:fixed;inset:0;pointer-events:none;z-index:40;color:#1768e8}
@@ -199,7 +200,9 @@
 .suzhou-art{position:absolute;left:0;top:0;width:393px;height:524px;overflow:hidden;text-align:left;transform-origin:top left;background:#f5f5f5}
 .suzhou-title{position:absolute;top:40px;left:36px;width:321px;font-family:"FZYouHeiS","PingFang SC",sans-serif;font-size:44px;font-weight:600;line-height:50px;letter-spacing:-1px}
 .suzhou-subtitle{position:absolute;top:148px;left:36px;display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;color:rgba(0,0,0,.45);white-space:nowrap}
-.suzhou-subtitle img{flex:none}
+/* Draw the hairline in CSS: subpixel SVG image dimensions can fail on mobile WebKit. */
+.suzhou-subtitle>span{display:inline-flex;align-items:center;flex:none}
+.suzhou-subtitle>span+span:before{content:"";height:14px;border-left:.5px solid rgba(0,0,0,.2);margin-right:8px}
 .suzhou-device{position:absolute;left:24px;right:24px;top:200px;bottom:-17px;border-radius:40px 40px 0 0;background:#fafafa;box-shadow:0 8px 40px rgba(0,0,0,.16);overflow:hidden}
 .cover-dialogue{width:393px;transform:scale(calc(345 / 393));transform-origin:top left;background:#f5f5f5;pointer-events:none;user-select:none;color:var(--dots-title)}
 .cover-dialogue .sheet-space{overflow:clip;min-height:0}
@@ -351,7 +354,7 @@
 <template id="posterCoverTemplate">
   <div class="suzhou-art" aria-hidden="true">
     <div class="suzhou-title">苏州三日游<br>旅行攻略</div>
-    <div class="suzhou-subtitle"><span>每日路线</span><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjAuNSIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDAuNSAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlZlY3RvciAyIiBkPSJNMC4yNSAwVjE0IiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLW9wYWNpdHk9IjAuMiIvPgo8L3N2Zz4K" alt=""><span>必玩景点</span><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjAuNSIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDAuNSAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlZlY3RvciAyIiBkPSJNMC4yNSAwVjE0IiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLW9wYWNpdHk9IjAuMiIvPgo8L3N2Zz4K" alt=""><span>必吃美食</span><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjAuNSIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDAuNSAxNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlZlY3RvciAyIiBkPSJNMC4yNSAwVjE0IiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLW9wYWNpdHk9IjAuMiIvPgo8L3N2Zz4K" alt=""><span>住宿建议</span></div>
+    <div class="suzhou-subtitle"><span>每日路线</span><span>必玩景点</span><span>必吃美食</span><span>住宿建议</span></div>
     <div class="suzhou-device"><div class="cover-dialogue conversation-mode"><header class="sheet-header"><span class="sheet-icon"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI2IiBoZWlnaHQ9IjI2IiB2aWV3Qm94PSIwIDAgMjYgMjYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJiYWNrIj4KPHBhdGggaWQ9InVuaW9uIiBkPSJNNS42MzQwNiAxMi44Mzk5QzUuNTYwMjUgMTIuOTIyNSA1LjU2MDIgMTMuMDQ4OCA1LjYzMzk1IDEzLjEzMTVMMTIuNzUzOCAyMS4xMTgzQzEzLjEwOTMgMjEuNTE3MiAxMy4wODAyIDIyLjEzNDIgMTIuNjg4OCAyMi40OTY1QzEyLjI5NzQgMjIuODU4OCAxMS42OTE5IDIyLjgyOTIgMTEuMzM2NCAyMi40MzA0TDMuNTAxMjYgMTMuNjQxMkMzLjE2OTQxIDEzLjI2ODkgMy4xNjk2MiAxMi43MDA2IDMuNTAxNzUgMTIuMzI4NkwxMS4zMjIyIDMuNTY5MDlDMTEuNjc4MSAzLjE3MDUyIDEyLjI4MzYgMy4xNDEzNyAxMi42NzQ3IDMuNTAzOThDMTMuMDY1OSAzLjg2NjU5IDEzLjA5NDUgNC40ODM2NSAxMi43Mzg2IDQuODgyMjJMNS42MzQwNiAxMi44Mzk5WiIgZmlsbD0iYmxhY2siIGZpbGwtb3BhY2l0eT0iMC44Ii8+CjwvZz4KPC9zdmc+Cg==" alt="" width="22" height="22"></span><h2><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJ7dXNlci5hdmF0YXJ9Ij4KPHBhdGggaWQ9IlZlY3RvciIgZD0iTTEwLjIzMTMgMjAuOTk4M0MxMC4yMzEzIDIwLjk5NzkgMTAuMjMxNiAyMC45OTc2IDEwLjIzMTkgMjAuOTk3NkMxMC42OTAyIDIwLjk5NzYgMTEuMDE1NyAyMC45ODk4IDExLjQwNzcgMjAuOTgyQzEyLjI2NDkgMjAuOTcwMyAxMy4xMTgyIDIwLjkwMjUgMTMuOTY0OSAyMC43Njk2QzE0LjgxMDQgMjAuNjM0MSAxNS42MzEyIDIwLjM3ODggMTYuMzk3MiAyMC4wMTRDMTcuOTM3IDE5LjI3NCAxOS4xODg5IDE4LjA5MzYgMTkuOTczMiAxNi42NDFDMjAuMzYwMSAxNS45MTc5IDIwLjYzMTEgMTUuMTQ1MyAyMC43NzU3IDE0LjM0NjdDMjAuOTEzOCAxMy41NTE5IDIwLjk5OTggMTIuNzQ4MSAyMC45OTk4IDExLjk0MDNDMjAuOTk5OCA5Ljc5NzE1IDIwLjIyODUgNy40ODg1MiAxOC4zODM4IDUuNjQzN0MxNi41Mzc5IDMuODAwMTkgMTQuMzQwMSAzLjAwMDI0IDEyLjA1NjQgMy4wMDAyNEMxMS4yNTEzIDMuMDAwMjQgMTAuNDQ3NSAzLjA4NDkzIDkuNjUyODYgMy4yMjQzM0M4Ljg1NTU5IDMuMzY4OTUgOC4wODE3NiAzLjYzOTk0IDcuMzU4NzMgNC4wMjY4OEM1LjkwNzQ4IDQuODExMTkgNC43MjU4OSA2LjA2MTkxIDMuOTg1OTMgNy42MDA1NkMzLjYyMTE2IDguMzY3OTMgMy4zNjcxMyA5LjE4NzQyIDMuMjMwMzQgMTAuMDM0M0MzLjA5ODc2IDEwLjg3OTggMy4wMjg0MiAxMS43MzQ1IDMuMDE3OTkgMTIuNTkxN0MzLjAwODg4IDEyLjk4MzkgMy4wMDIzNiAxMy4zNjQzIDMuMDAyMzYgMTMuNzY4MkMzLjAwMjM2IDEzLjg3NzYgMy4wMDIxNyAxNC40NTg2IDMuMDAxODkgMTUuMjQ3N0MzLjAwMSAxNy43NzYgMy4wMDA1NSAxOS4wNDAxIDMuNzAxMTMgMTkuODg4NUMzLjgyNDY1IDIwLjAzODEgMy45NjIxIDIwLjE3NTYgNC4xMTE2NiAyMC4yOTkxQzQuOTU5OTQgMjAuOTk5OCA2LjIyNDEyIDIwLjk5OTYgOC43NTI0OSAyMC45OTkyQzkuNTMwMjggMjAuOTk5IDEwLjEwNjkgMjAuOTk4OSAxMC4yMzA4IDIwLjk5ODlDMTAuMjMxMiAyMC45OTg5IDEwLjIzMTMgMjAuOTk4NiAxMC4yMzEzIDIwLjk5ODNaIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMF8xNTEpIi8+CjwvZz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8wXzE1MSIgeDE9IjE4LjUiIHkxPSI1LjUiIHgyPSIyLjk5OTc2IiB5Mj0iMjEuMDAwMiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjODNGMkRGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0Q5RjdGMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=" alt="" width="24" height="24">点点</h2></header><div class="sheet-space"><div class="cover-dialogue-messages"></div></div></div></div>
     <div class="suzhou-fade"></div>
   </div>
@@ -1276,9 +1279,9 @@ readerScroll.addEventListener('pointercancel',finishReaderGesture);
     const preview=frame.querySelector('.cover-dialogue-messages');
     if(title){
       frame.querySelector('.suzhou-title').replaceChildren(title[0],document.createElement('br'),title[1]);
-      const subtitle=frame.querySelector('.suzhou-subtitle'),divider=subtitle.querySelector('img').cloneNode(true);
+      const subtitle=frame.querySelector('.suzhou-subtitle');
       subtitle.replaceChildren();
-      xinjiangTags.forEach((text,index)=>{if(index)subtitle.append(divider.cloneNode(true));const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
+      xinjiangTags.forEach(text=>{const tag=document.createElement('span');tag.textContent=text;subtitle.append(tag)});
       preview.append(...originalMessages.map(message=>message.cloneNode(true)));
     }else{
       screen.classList.add('cover-dialogue-suzhou');
