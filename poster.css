@@ -17,7 +17,21 @@
 /* A clipped first frame, not a second scroll surface. Gestures belong to the note. */
 .poster-note{height:100%;position:relative;overflow:clip;background:#f5f5f5;color:rgba(0,0,0,.8)}
 .poster-detail-preview{height:100%;overflow:clip;pointer-events:none;user-select:none;-webkit-user-select:none}
-.poster-footer{position:absolute;left:0;right:0;bottom:0;height:72px;padding:20px 16px 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(to bottom,rgba(245,245,245,0),#f5f5f5);pointer-events:none}
+/* Figma 2269:4982: progressive background blur and tint, limited to the preview. */
+.poster-footer{position:absolute;left:0;right:0;bottom:0;height:min(217px,100%);padding:0 16px 30px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.poster-preview-mask,.poster-preview-mask>i,.poster-preview-mask:after{position:absolute;inset:0;pointer-events:none}
+.poster-preview-mask{overflow:hidden}
+/* Overlapping, feathered bands approximate Figma's 0→24 progressive blur
+   (0→12 CSS blur). No blur is applied to the actual conversation content. */
+.poster-preview-mask>i{-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));-webkit-mask-image:linear-gradient(to bottom,transparent var(--start),#000 var(--from),#000 var(--to),transparent var(--end));mask-image:linear-gradient(to bottom,transparent var(--start),#000 var(--from),#000 var(--to),transparent var(--end))}
+.poster-preview-mask>i:nth-child(1){--blur:2px;--start:0%;--from:12%;--to:20%;--end:32%}
+.poster-preview-mask>i:nth-child(2){--blur:4px;--start:12%;--from:28%;--to:36%;--end:48%}
+.poster-preview-mask>i:nth-child(3){--blur:6px;--start:28%;--from:44%;--to:52%;--end:64%}
+.poster-preview-mask>i:nth-child(4){--blur:8px;--start:44%;--from:60%;--to:68%;--end:80%}
+.poster-preview-mask>i:nth-child(5){--blur:10px;--start:60%;--from:76%;--to:84%;--end:96%}
+.poster-preview-mask>i:nth-child(6){--blur:12px;-webkit-mask-image:linear-gradient(to bottom,transparent 76%,#000 92%);mask-image:linear-gradient(to bottom,transparent 76%,#000 92%)}
+.poster-preview-mask:after{content:"";background:linear-gradient(to bottom,rgba(246,247,251,0),#f6f7fb)}
+.poster-footer>.dialogue-cta{position:relative;z-index:1;width:139px;height:44px;padding:6px 16px 6px 12px;border:1.5px solid #fff;border-radius:49px;background:rgba(255,255,255,.95);box-shadow:0 6px 20px rgba(0,0,0,.08);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .poster-mode>.note-scroll{min-height:0;touch-action:pan-y;overflow-anchor:none}
 .poster-mode>.note-scroll>.media-area{display:none}
 
