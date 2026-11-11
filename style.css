@@ -120,16 +120,24 @@
 .query-mode .sheet-space #followupMessages:not(:empty){padding-top:0}
 .query-mode .sheet-space #followupMessages p{font-size:15px;line-height:22px;margin:0}
 
-/* Horizontal note variant: preserve the existing media height and safe page insets. */
+/* Horizontal note, Figma 2259:16499: 393 × 524 content + 24px page indicator. */
+.paged-mode .media-area{height:auto;min-height:0;max-height:none;background:#fff}
+.paged-note{height:auto;aspect-ratio:3/4}
+@media(min-width:481px){.paged-mode .note-header>.system-bar{height:54px;padding:18px 17px 16px 25px}}
+.conversation-expand-mark{display:none}
+.paged-note .conversation-entry-mark{display:none}
+.paged-note .conversation-expand-mark{display:block}
 .answer-pages[hidden],.answer-page-count[hidden],.answer-page-dots[hidden],.answer-scroll[hidden]{display:none}
 .answer-pages{display:flex;flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y;cursor:grab}
 .answer-pages::-webkit-scrollbar{display:none}
 .answer-pages.dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
 .answer-page{flex:0 0 100%;height:100%;min-width:0;padding:16px;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden}
+.answer-page:first-child{padding-top:24px}
 .answer-page-body{height:100%;display:flex;flex-direction:column;gap:20px}
 .answer-page-body>*{flex-shrink:0;margin:0}
 .answer-page-body>.user-message{margin-left:auto}
-.answer-page-body>.ai-header{min-height:32px;margin-bottom:-4px}
+.answer-page-body>.ai-header{display:none}
+.answer-page-body>.user-message{border-radius:18px}
 .answer-page-body>.dots-response{padding:20px 16px;overflow:visible;min-height:0}
 .page-block+.page-block{margin-top:12px}
 .page-block>h4{margin:0 0 10px}
@@ -140,17 +148,17 @@
 .ai-card .answer-actions{display:none}
 .answer-page .text-continues{border-bottom-left-radius:0;border-bottom-right-radius:0}
 .answer-page .text-continuation{border-top-left-radius:0;border-top-right-radius:0}
-.answer-page-count{position:absolute;right:10px;top:10px;background:#0005;color:white;font-size:11px;line-height:18px;border-radius:12px;padding:2px 7px;pointer-events:none}
-.paged-note .ai-footer{position:relative;min-height:56px;height:56px;flex-shrink:0;padding:0 16px;display:grid;grid-template-rows:40px 16px;justify-content:stretch;gap:0;background:var(--dots-bg-0)}
-.paged-note .view-conversation{justify-self:center;align-self:center}
-.paged-note .answer-page-dots,.paged-note .answer-page-dots button{height:16px}
-.paged-note .answer-page-dots button:after{top:5.5px}
+.answer-page-count{position:absolute;right:10px;top:10px;height:24px;display:flex;align-items:center;background:rgba(48,48,52,.5);color:white;font-size:12px;font-weight:500;line-height:18px;border-radius:100px;padding:0 6px;pointer-events:none}
+.paged-note .ai-footer{height:56px;min-height:0;padding:0 10px 10px;align-items:flex-end;justify-content:flex-end;background:none}
+.paged-note .view-conversation{height:36px;min-width:120px;padding:0 12px 0 8px;gap:4px;font-size:13px;line-height:20px;font-weight:500}
+.paged-note .view-conversation .dialogue-cta-logo{width:18px;height:18px}
+.paged-mode .answer-page-dots{background:#fff}
 .answer-page-dots{height:24px;display:flex;align-items:center;justify-content:center;gap:4px;background:transparent;pointer-events:auto}
 .answer-page-dots button{width:5px;height:24px;padding:0;position:relative}
 .answer-page-dots button:after{content:'';position:absolute;width:5px;height:5px;left:0;top:9.5px;border-radius:50%;background:var(--dots-fill-3);transition:transform .18s,background-color .18s}
 .answer-page-dots button.edge-dot:after{transform:scale(.6)}
 .answer-page-dots button[aria-current=true]:after{background:#ff2442}
-/* Use the original note-card dimensions; only the conversation opens full screen. */
+/* Pagination is outside the content viewport; only the conversation opens full screen. */
 .paged-mode>.note-scroll{touch-action:pinch-zoom;overflow-anchor:none}
 .paged-mode .answer-pages{touch-action:pinch-zoom}
 .paged-dragging .note-scroll{cursor:grabbing;user-select:none;-webkit-user-select:none}

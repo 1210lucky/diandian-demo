@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mask group">
+<mask id="mask0_0_4" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="18" height="18">
+<rect id="Rectangle 4832" width="18" height="18" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_4)">
+<path id="Rectangle 4833 (Stroke)" d="M7.87489 3.67493C7.87489 3.30213 8.1771 2.99993 8.54989 2.99993H12.8249C14.0262 2.99993 14.9999 3.97371 14.9999 5.17493V9.44993C14.9999 9.82272 14.6977 10.1249 14.3249 10.1249C13.9521 10.1249 13.6499 9.82272 13.6499 9.44993V5.17493C13.6499 4.71929 13.2806 4.34993 12.8249 4.34993H8.54989C8.1771 4.34993 7.87489 4.04772 7.87489 3.67493Z" fill-rule="evenodd" clip-rule="evenodd" fill="black" fill-opacity="0.8"/>
+<path id="Rectangle 4834 (Stroke)" d="M10.1251 14.3251C10.1251 14.6979 9.8229 15.0001 9.45011 15.0001L5.17503 15.0001C3.97382 15.0001 3.00004 14.0263 3.00004 12.8251L3.00004 8.55007C3.00004 8.17728 3.30224 7.87507 3.67504 7.87507C4.04783 7.87507 4.35004 8.17728 4.35004 8.55007L4.35004 12.8251C4.35004 13.2807 4.7194 13.6501 5.17504 13.6501L9.45011 13.6501C9.8229 13.6501 10.1251 13.9523 10.1251 14.3251Z" fill-rule="evenodd" clip-rule="evenodd" fill="black" fill-opacity="0.8"/>
+</g>
+</g>
+</svg>
