@@ -53,6 +53,8 @@ function resetExperience(){
   returnToFeed();
 }
 window.addEventListener('popstate',event=>{
+  // Closing a picture returns to the same note without resetting its page or scroll.
+  if(window.noteImageViewer?.handleHistory(event.state))return;
   // Browser back may arrive while the conversation or source-note overlay is open.
   clearTimeout(closeTimer);cancelConversationTransition();demoMotion.cancel();sourceAnimation?.cancel();
   document.activeElement?.blur();

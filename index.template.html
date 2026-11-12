@@ -26,6 +26,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="style.css?v=paged-layout-20261111">
 <link rel="stylesheet" href="poster.css?v=preview-mask-20261111">
+<link rel="stylesheet" href="note-image-viewer.css?v=paged-image-viewer-20261112">
 </head>
 <body>
 <header class="workspace-header"><span class="wordmark"><span class="brand-dot"></span>点点 <b>AI</b><span class="separator">/</span><span class="project-name">互动笔记</span></span><div class="workspace-actions"><span class="prototype-label">概念原型 · 示例内容</span><button id="reset" class="reset">重新体验 ↻</button></div></header>
@@ -74,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话，轻点进入点点对话页"></div><span id="answerPageCount" class="answer-page-count" hidden></span>
+        <div id="answerPages" class="answer-pages" hidden tabindex="0" role="region" aria-label="左右滑动阅读新疆旅行对话，轻点查看笔记图片"></div><span id="answerPageCount" class="answer-page-count" hidden></span>
         <footer class="ai-footer"><button type="button" class="view-conversation dialogue-cta" id="viewConversation"><span class="dialogue-cta-logo"><img class="conversation-entry-mark" src="assets/conversation-entry-logo.svg" alt=""><img class="conversation-expand-mark" src="assets/conversation-expand.svg" alt=""></span><span>查看完整对话</span></button></footer>
       </article>
       <nav id="answerPageDots" class="answer-page-dots" aria-label="对话分页" hidden></nav>
@@ -116,6 +117,10 @@
     <div id="sourceScroll" class="source-scroll"><div class="source-hero" id="sourceGallery" tabindex="0" aria-label="原笔记图片，可左右滑动"><img id="sourceImage" src="assets/sources/note-1-1.webp" alt="" width="393" height="524" draggable="false"><span id="sourceImageCount" class="source-image-count">1/18</span><button type="button" id="sourceImagePrev" class="source-image-nav prev" aria-label="上一张图片"><img src="assets/back.svg" alt="" width="20" height="20"></button><button type="button" id="sourceImageNext" class="source-image-nav next" aria-label="下一张图片"><img src="assets/back.svg" alt="" width="20" height="20"></button></div><div id="sourceDots" class="source-dots" aria-hidden="true"></div><section class="source-body"><h2 id="sourceTitle"></h2><span class="source-summary-label">笔记摘要</span><p id="sourceDescription"></p><p id="sourceTags" class="hashtags"></p><p id="sourceDate" class="source-date"></p><a id="sourceOriginal" class="source-original" target="_blank" rel="noopener noreferrer">在小红书打开原笔记 ↗</a></section><section id="sourceComments" class="source-comments"><p class="comment-count">评论 <span id="sourceCommentCount">0</span></p><div id="sourceCommentList"></div><a id="sourceCommentsOriginal" class="source-empty" target="_blank" rel="noopener noreferrer">在原笔记查看全部评论 ↗</a><form id="sourceCommentForm" hidden><label class="sr-only" for="sourceCommentInput">评论内容</label><input id="sourceCommentInput" placeholder="说点什么…" maxlength="200" required><button type="submit">发布</button></form></section></div>
     <footer class="engage-bar"><div class="engage-row"><button class="comment-entry" id="sourceCommentEntry"><img src="assets/edit.svg" alt="" width="20" height="20">说点什么…</button><button class="engage-action" id="sourceLike" aria-label="点赞来源笔记" aria-pressed="false"><img src="assets/like.svg" alt="" width="28" height="28"><span>0</span></button><button class="engage-action" id="sourceCollect" aria-label="收藏来源笔记" aria-pressed="false"><img src="assets/collect.svg" alt="" width="28" height="28"><span>0</span></button><button class="engage-action" id="sourceCommentLink" aria-label="查看来源笔记评论"><img src="assets/chat.svg" alt="" width="28" height="28"><span id="sourceCommentTotal">0</span></button></div><div class="home-indicator"></div></footer><div class="toast" id="sourceToast" role="status"></div>
   </section>
+  <section id="noteImageViewer" class="note-image-viewer" role="dialog" aria-modal="true" aria-label="笔记图片查看页" hidden>
+    <div id="noteImagePages" class="note-image-pages" tabindex="0" aria-label="左右滑动或使用方向键查看图片"></div>
+    <header class="note-image-toolbar"><button type="button" class="note-image-close" id="closeNoteImages" aria-label="关闭图片查看"><img src="assets/reader-close.svg" alt="" width="24" height="24"></button><span id="noteImageCount" class="note-image-count" role="status" aria-live="polite">1/1</span></header>
+  </section>
   <dialog id="commentDialog"><form method="dialog" class="dialog-heading"><b>写评论</b><button aria-label="关闭评论">×</button></form><p class="demo-notice">评论仅显示在本次演示中</p><form id="commentForm" class="input-form"><label class="sr-only" for="commentInput">评论内容</label><input id="commentInput" placeholder="说点什么…" maxlength="200" required><button type="submit">发布</button></form></dialog>
 </section>
 <aside class="demo-guide"><span class="guide-kicker">INTERACTIVE NOTE / 05</span><h2>从一篇笔记，<br>走进点点对话。</h2><p class="guide-intro" id="guideIntro">点击左列「新疆旅游攻略」，<br>进入可上下滑动的点点互动笔记。</p><div class="guide-items"><div><span>01</span><p><b>从双列流进入</b>点击对应封面，打开互动笔记。</p></div><div><span>02</span><p><b>完整图文内容</b>阅读分享的行程、攻略和对话内容。</p></div><div><span>03</span><p><b>随时继续追问</b>查看完整对话，再点「我也问点点」继续聊。</p></div></div><nav class="demo-jumps" aria-label="演示跳转"><button data-jump="responseStart">回答开头</button><button data-jump="itinerary">行程安排</button><button data-jump="tips">实用提醒</button></nav><div class="live-state"><span class="live-dot"></span><span id="guideState">等待开始阅读</span></div><p class="guide-footnote">Figma 原稿内容 · Dots 组件规范<br>仅为交互原型，旅行内容未作实时核验</p></aside>
@@ -138,5 +143,5 @@
  </article></div>
 </div>
 </template>
-<script src="source-notes.js"></script><script src="motion.js?v=card-zoom-color-2"></script><script src="demo-config.js?v=image-note-toggle-1"></script><script src="app.js?v=page-dots-3"></script><script src="pagination.js?v=page-dots-3"></script><script src="paged-reader.js?v=clean-reading-1"></script><script src="vertical-reader.js?v=vertical-reading-1"></script><script src="poster.js?v=suzhou-cover-1"></script><script src="feed.js?v=page-dots-3"></script><script src="annotations.js?v=scheme-anchors-2"></script>
+<script src="source-notes.js"></script><script src="motion.js?v=card-zoom-color-2"></script><script src="demo-config.js?v=image-note-toggle-1"></script><script src="app.js?v=page-dots-3"></script><script src="pagination.js?v=paged-image-viewer-20261112"></script><script src="paged-reader.js?v=paged-image-viewer-20261112"></script><script src="vertical-reader.js?v=vertical-reading-1"></script><script src="poster.js?v=suzhou-cover-1"></script><script src="note-image-viewer.js?v=paged-image-viewer-20261112"></script><script src="feed.js?v=paged-image-viewer-20261112"></script><script src="annotations.js?v=scheme-anchors-2"></script>
 </body></html>

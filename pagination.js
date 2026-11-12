@@ -159,6 +159,6 @@ pageTrack.addEventListener('scroll',()=>{
 },{passive:true});
 pageTrack.addEventListener('keydown',e=>{
   if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();selectAnswerPage(e.key==='Home'?0:e.key==='End'?pageTrack.children.length-1:answerPageIndex+(e.key==='ArrowRight'?1:-1))}
-  else if(e.key==='Enter'||e.key===' '){e.preventDefault();openPagedConversation()}
+  else if(e.key==='Enter'||e.key===' '){e.preventDefault();openPagedImage()}
 });
 new ResizeObserver(()=>{if(isPagedNote)buildAnswerPages()}).observe(pageTrack);

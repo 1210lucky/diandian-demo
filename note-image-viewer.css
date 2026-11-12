@@ -1,0 +1,15 @@
+/* Scheme 2 image viewer: black canvas, close control, centered page counter.
+   The note pages retain their exact layout and are scaled as static images. */
+.note-image-viewer[hidden]{display:none}
+.note-image-viewer{position:absolute;inset:0;z-index:55;overflow:hidden;border-radius:inherit;background:#000;color:#fff;isolation:isolate}
+.note-image-toolbar{position:absolute;top:max(44px,calc(env(safe-area-inset-top,0px) + 12px));left:4px;right:4px;height:44px;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+.note-image-close{position:absolute;left:0;top:0;width:44px;height:44px;padding:10px;display:grid;place-items:center;pointer-events:auto;color:#fff}
+.note-image-close img{width:24px;height:24px;filter:brightness(0) invert(1)}
+.note-image-count{font-size:16px;font-weight:500;line-height:24px;font-variant-numeric:tabular-nums;color:#fff}
+.note-image-pages{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior:none;touch-action:pan-x;outline-offset:-3px}
+.note-image-pages::-webkit-scrollbar{display:none}
+.note-image-pages.dragging{scroll-snap-type:none;cursor:grabbing}
+.note-image-slide{flex:0 0 100%;min-width:0;height:100%;margin:0;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;scroll-snap-stop:always;overflow:hidden;user-select:none;-webkit-user-select:none}
+.note-image-frame{position:relative;flex:none;overflow:hidden;background:#f5f5f5;pointer-events:none}
+.note-image-art{transform-origin:top left;pointer-events:none}
+.note-image-art *{pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important}

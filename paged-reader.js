@@ -1,11 +1,11 @@
-// Swipe within the compact note card; tap to continue in the full Dots conversation.
+// Swipe within the compact note card; tap to view its pages as pictures.
 const pagedPhone=$('.phone');
 let pagedGesture=null,pagedWheelTimer=0,ignorePagedClickUntil=0;
 const reducedPagedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 
-function openPagedConversation(){
+function openPagedImage(){
   if(!isPagedNote||pagedPhone.dataset.view!=='note'||!askOverlay.hidden)return;
-  openAsk(true,{...capturePagedPosition(),reading:true});
+  window.noteImageViewer.open();
 }
 function resetPagedReader(){
   clearTimeout(pagedWheelTimer);
@@ -81,7 +81,7 @@ note.addEventListener('pointercancel',event=>finishPagedGesture(event,true));
 note.addEventListener('click',event=>{
   if(!isPagedNote||!askOverlay.hidden)return;
   if(performance.now()<ignorePagedClickUntil){event.preventDefault();event.stopPropagation();return}
-  if(event.target.closest('.media-area')&&!pagedInteractive(event.target))openPagedConversation();
+  if(event.target.closest('.ai-card')&&!pagedInteractive(event.target))openPagedImage();
 },true);
 note.addEventListener('wheel',event=>{
   if(!isPagedNote||pagedPhone.dataset.view!=='note'||!askOverlay.hidden)return;
